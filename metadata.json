@@ -1,0 +1,6 @@
+{
+  "name": "VARSA — Adaptive Weather Intelligence Engine",
+  "description": "Adaptive multi-model weather forecast blending and meteorological decision support system for India.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
