@@ -22,7 +22,7 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({
   onSelectRegion,
   onSelectVariable
 }) => {
-  const [selectedMetric, setSelectedMetric] = useState<'mae' | 'rmse' | 'csi' | 'bias'>('mae');
+  const [selectedMetric, setSelectedMetric] = useState<'mae' | 'rmse' | 'bias' | 'csi' | 'pod' | 'far'>('mae');
 
   const metricsData = VERIFICATION_DATA[variable][region];
   const currentVariable = VARIABLES[variable];
@@ -40,7 +40,7 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({
   const values = models.map(m => Math.abs(metricsData[m.id][selectedMetric]));
   const maxVal = Math.max(...values) * 1.25 || 1;
 
-  const metricDescriptions = {
+  const metricDescriptions: Record<'mae' | 'rmse' | 'bias' | 'csi' | 'pod' | 'far', { name: string; unit: string; better: string; summary: string }> = {
     mae: {
       name: 'Mean Absolute Error (MAE)',
       unit: currentVariable.unit,
@@ -53,17 +53,29 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({
       better: 'Lower is better',
       summary: 'Penalizes large outlier forecast errors more heavily than MAE.'
     },
+    bias: {
+      name: 'Mean Forecast Bias',
+      unit: currentVariable.unit,
+      better: 'Closest to 0 is better',
+      summary: 'Directional tendency: positive indicates systematic over-prediction, negative under-prediction.'
+    },
     csi: {
       name: 'Critical Success Index (CSI / Threat Score)',
       unit: 'ratio (0-1)',
       better: 'Higher is better',
       summary: 'Measures forecast skill for threshold events (Hits / (Hits + Misses + False Alarms)).'
     },
-    bias: {
-      name: 'Mean Forecast Bias',
-      unit: currentVariable.unit,
-      better: 'Closest to 0 is better',
-      summary: 'Directional tendency: positive indicates systematic over-prediction, negative under-prediction.'
+    pod: {
+      name: 'Probability of Detection (POD)',
+      unit: 'ratio (0-1)',
+      better: 'Higher is better',
+      summary: 'Proportion of observed events correctly identified by the model (Hits / (Hits + Misses)).'
+    },
+    far: {
+      name: 'False Alarm Ratio (FAR)',
+      unit: 'ratio (0-1)',
+      better: 'Lower is better',
+      summary: 'Proportion of forecasted events that failed to materialize (False Alarms / (Hits + False Alarms)).'
     }
   };
 
@@ -147,20 +159,36 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({
               RMSE
             </button>
             <button
-              onClick={() => setSelectedMetric('csi')}
-              className={`px-2.5 py-1 text-xs font-medium rounded ${
-                selectedMetric === 'csi' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600'
-              }`}
-            >
-              CSI (Skill)
-            </button>
-            <button
               onClick={() => setSelectedMetric('bias')}
               className={`px-2.5 py-1 text-xs font-medium rounded ${
                 selectedMetric === 'bias' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600'
               }`}
             >
-              Mean Bias
+              Bias
+            </button>
+            <button
+              onClick={() => setSelectedMetric('csi')}
+              className={`px-2.5 py-1 text-xs font-medium rounded ${
+                selectedMetric === 'csi' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600'
+              }`}
+            >
+              CSI
+            </button>
+            <button
+              onClick={() => setSelectedMetric('pod')}
+              className={`px-2.5 py-1 text-xs font-medium rounded ${
+                selectedMetric === 'pod' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600'
+              }`}
+            >
+              POD
+            </button>
+            <button
+              onClick={() => setSelectedMetric('far')}
+              className={`px-2.5 py-1 text-xs font-medium rounded ${
+                selectedMetric === 'far' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600'
+              }`}
+            >
+              FAR
             </button>
           </div>
         </div>
@@ -216,37 +244,37 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({
           <div className="p-3 bg-emerald-50/60 border border-emerald-200 rounded">
             <div className="text-[11px] font-mono uppercase text-emerald-800 font-semibold flex items-center gap-1.5">
               <Award className="w-3.5 h-3.5 text-emerald-600" />
-              Skill Improvement over Equal Weight
+              Demonstration Delta vs Equal Weight
             </div>
             <div className="text-2xl font-mono font-bold text-emerald-950 mt-1 tabular-nums">
               +{metricsData.skillImprovementPercent}%
             </div>
             <p className="text-[11px] text-emerald-800/80 mt-1">
-              Error reduction attained by contextually suppressing biased member predictions
+              Simulated error reduction attained by contextually suppressing biased member predictions
             </p>
           </div>
 
           <div className="p-3 bg-slate-50 border border-slate-200 rounded">
             <div className="text-[11px] font-mono uppercase text-slate-600 font-semibold">
-              VARSA Absolute MAE
+              VARSA Absolute MAE (Prototype)
             </div>
             <div className="text-2xl font-mono font-bold text-slate-900 mt-1 tabular-nums">
               {metricsData.varsa.mae} <span className="text-xs text-slate-500 font-normal">{currentVariable.unit}</span>
             </div>
             <p className="text-[11px] text-slate-500 mt-1">
-              Lowest absolute error across individual NWP models and simple 1/3 ensemble mean
+              Lowest absolute error across individual NWP models and simple 1/3 ensemble mean in test runs
             </p>
           </div>
 
           <div className="p-3 bg-slate-50 border border-slate-200 rounded">
             <div className="text-[11px] font-mono uppercase text-slate-600 font-semibold">
-              VARSA Systematic Bias
+              VARSA Systematic Bias (Prototype)
             </div>
             <div className="text-2xl font-mono font-bold text-slate-900 mt-1 tabular-nums">
               {metricsData.varsa.bias > 0 ? `+${metricsData.varsa.bias}` : metricsData.varsa.bias} <span className="text-xs text-slate-500 font-normal">{currentVariable.unit}</span>
             </div>
             <p className="text-[11px] text-slate-500 mt-1">
-              Neutralized directional drift; avoids GFS over-prediction and ECMWF under-prediction
+              Neutralized directional drift; balances GFS over-prediction and ECMWF under-prediction
             </p>
           </div>
         </div>
@@ -266,8 +294,10 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({
                 <th className="py-2.5 px-3">Forecasting System</th>
                 <th className="py-2.5 px-3">MAE ({currentVariable.unit})</th>
                 <th className="py-2.5 px-3">RMSE ({currentVariable.unit})</th>
-                <th className="py-2.5 px-3">Systematic Bias</th>
-                <th className="py-2.5 px-3">CSI Threat Score</th>
+                <th className="py-2.5 px-3">Bias</th>
+                <th className="py-2.5 px-3">CSI</th>
+                <th className="py-2.5 px-3">POD</th>
+                <th className="py-2.5 px-3">FAR</th>
                 <th className="py-2.5 px-3 font-bold text-slate-900">Rank</th>
               </tr>
             </thead>
@@ -286,6 +316,8 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({
                       {met.bias > 0 ? `+${met.bias}` : met.bias}
                     </td>
                     <td className="py-2 px-3 text-slate-800">{met.csi}</td>
+                    <td className="py-2 px-3 text-slate-800">{met.pod}</td>
+                    <td className="py-2 px-3 text-slate-800">{met.far}</td>
                     <td className="py-2 px-3">
                       {m.isVarsa ? (
                         <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">
@@ -304,12 +336,12 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({
       </div>
 
       {/* Scientific Disclosure Notice */}
-      <div className="bg-slate-50 border border-slate-200 p-4 rounded text-xs text-slate-600 leading-relaxed space-y-1">
-        <div className="font-semibold text-slate-800 uppercase font-mono text-[11px]">
-          Demonstration Dataset Disclosure:
+      <div className="bg-amber-50/70 border border-amber-200 p-4 rounded text-xs text-amber-950 leading-relaxed space-y-1">
+        <div className="font-semibold text-amber-900 uppercase font-mono text-[11px]">
+          Demonstration Dataset Disclosure & Scientific Honesty:
         </div>
         <p>
-          Historical verification statistics presented above are calibrated demonstration datasets structured for the Smart India Hackathon showcase. They illustrate the mathematical variance reduction achieved by non-linear adaptive ensemble blending versus simple arithmetic averaging over complex orographic terrain.
+          All demo metrics presented in this matrix are calibrated demonstration dataset values structured for the Smart India Hackathon showcase. These metrics illustrate the multi-model skill verification architecture and do NOT represent certified real-world operational forecasts. VARSA does not claim real-time operational forecasting until full IMD instrumentation integration.
         </p>
       </div>
     </div>

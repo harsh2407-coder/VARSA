@@ -104,6 +104,71 @@ export const ExtremeWeatherScreen: React.FC = () => {
         </div>
       </div>
 
+      {/* Operational Executive Guidance Summary Rows (Prompt Reference) */}
+      <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-xs space-y-3">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+          <span className="text-xs font-mono uppercase font-bold text-slate-700 tracking-wider">
+            Operational Early Hazard Matrix
+          </span>
+          <span className="text-[11px] font-mono text-slate-500">
+            Automated Cross-Model Consensus
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {/* Row 1: Heavy Rain */}
+          <div className="p-3 rounded border border-rose-200 bg-rose-50/50 flex flex-col justify-between space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-mono font-bold text-rose-900 uppercase">HEAVY RAIN</span>
+              <span className="text-[10px] font-mono bg-rose-100 text-rose-800 border border-rose-200 px-1.5 py-0.5 rounded font-bold">
+                Elevated Signal
+              </span>
+            </div>
+            <div className="flex items-baseline justify-between text-xs font-mono">
+              <span className="text-slate-800 font-semibold">Central India</span>
+              <span className="text-slate-500 font-bold">+24h</span>
+            </div>
+            <div className="text-[11px] text-slate-600">
+              94.2 mm/24h · Localized inundation in Narmada / Vidarbha basin
+            </div>
+          </div>
+
+          {/* Row 2: Heat */}
+          <div className="p-3 rounded border border-amber-200 bg-amber-50/50 flex flex-col justify-between space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-mono font-bold text-amber-900 uppercase">HEAT</span>
+              <span className="text-[10px] font-mono bg-amber-100 text-amber-800 border border-amber-200 px-1.5 py-0.5 rounded font-bold">
+                Moderate Signal
+              </span>
+            </div>
+            <div className="flex items-baseline justify-between text-xs font-mono">
+              <span className="text-slate-800 font-semibold">Northwest India</span>
+              <span className="text-slate-500 font-bold">+48h</span>
+            </div>
+            <div className="text-[11px] text-slate-600">
+              44.8 °C · Boundary layer thermal spike across Thar / Plains
+            </div>
+          </div>
+
+          {/* Row 3: High Wind */}
+          <div className="p-3 rounded border border-blue-200 bg-blue-50/50 flex flex-col justify-between space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-mono font-bold text-blue-900 uppercase">HIGH WIND</span>
+              <span className="text-[10px] font-mono bg-blue-100 text-blue-800 border border-blue-200 px-1.5 py-0.5 rounded font-bold">
+                Watch
+              </span>
+            </div>
+            <div className="flex items-baseline justify-between text-xs font-mono">
+              <span className="text-slate-800 font-semibold">West Coast</span>
+              <span className="text-slate-500 font-bold">+24h</span>
+            </div>
+            <div className="text-[11px] text-slate-600">
+              58.4 km/h · Monsoon westerly low-level jet coastal shear
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Extreme Weather Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredEvents.map((evt) => (

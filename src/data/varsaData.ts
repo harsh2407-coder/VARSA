@@ -68,12 +68,21 @@ export interface TimePointForecast {
   spread: number;
 }
 
+export interface ModelMetricScores {
+  mae: number;
+  rmse: number;
+  bias: number;
+  csi: number;
+  pod: number; // Probability of Detection (0-1, higher is better)
+  far: number; // False Alarm Ratio (0-1, lower is better)
+}
+
 export interface VerificationMetrics {
-  gfs: { mae: number; rmse: number; bias: number; csi: number };
-  ecmwf: { mae: number; rmse: number; bias: number; csi: number };
-  icon: { mae: number; rmse: number; bias: number; csi: number };
-  equalWeight: { mae: number; rmse: number; bias: number; csi: number };
-  varsa: { mae: number; rmse: number; bias: number; csi: number };
+  gfs: ModelMetricScores;
+  ecmwf: ModelMetricScores;
+  icon: ModelMetricScores;
+  equalWeight: ModelMetricScores;
+  varsa: ModelMetricScores;
   skillImprovementPercent: number; // vs equal weight
 }
 
@@ -84,6 +93,7 @@ export interface ExtremeWeatherEvent {
   regionId: RegionId;
   regionName: string;
   leadTime: LeadTimeId;
+  signalLabel: string; // e.g. "Elevated Signal", "Moderate Signal", "Watch"
   signalValue: string;
   threshold: string;
   severity: 'Advisory' | 'Watch' | 'Warning' | 'Severe Warning';
@@ -269,11 +279,19 @@ export function getAdaptiveWeights(
     }
   } else if (region === 'central') {
     if (regime === 'monsoon_convective') {
-      icon = 0.40;
-      ecmwf = 0.38;
-      gfs = 0.22;
-      rationale = 'ICON 13km non-hydrostatic core captures localized convective triggers in core monsoon zone; GFS downweighted due to known wet bias.';
-      disagreement = 6.4;
+      if (leadTime === '24h') {
+        ecmwf = 0.46;
+        gfs = 0.32;
+        icon = 0.22;
+        rationale = 'ECMWF synoptic moisture advection (46%) balanced with GFS thermal low boundary dynamics (32%) and ICON localized convective triggers (22%).';
+        disagreement = 5.4;
+      } else {
+        icon = 0.40;
+        ecmwf = 0.38;
+        gfs = 0.22;
+        rationale = 'ICON 13km non-hydrostatic core captures localized convective triggers in core monsoon zone; GFS downweighted due to known wet bias.';
+        disagreement = 6.4;
+      }
     } else {
       ecmwf = 0.48;
       gfs = 0.28;
@@ -447,151 +465,151 @@ export function getForecastTimeSeries(
 export const VERIFICATION_DATA: Record<VariableId, Record<RegionId, VerificationMetrics>> = {
   rainfall: {
     north: {
-      gfs: { mae: 6.4, rmse: 9.8, bias: +2.1, csi: 0.54 },
-      ecmwf: { mae: 4.8, rmse: 7.2, bias: -0.6, csi: 0.68 },
-      icon: { mae: 5.3, rmse: 8.1, bias: +0.8, csi: 0.62 },
-      equalWeight: { mae: 5.1, rmse: 7.8, bias: +0.7, csi: 0.64 },
-      varsa: { mae: 3.9, rmse: 5.9, bias: +0.1, csi: 0.76 },
+      gfs: { mae: 6.4, rmse: 9.8, bias: +2.1, csi: 0.54, pod: 0.68, far: 0.32 },
+      ecmwf: { mae: 4.8, rmse: 7.2, bias: -0.6, csi: 0.68, pod: 0.79, far: 0.21 },
+      icon: { mae: 5.3, rmse: 8.1, bias: +0.8, csi: 0.62, pod: 0.74, far: 0.26 },
+      equalWeight: { mae: 5.1, rmse: 7.8, bias: +0.7, csi: 0.64, pod: 0.76, far: 0.24 },
+      varsa: { mae: 3.9, rmse: 5.9, bias: +0.1, csi: 0.76, pod: 0.86, far: 0.15 },
       skillImprovementPercent: 23.5
     },
     central: {
-      gfs: { mae: 8.9, rmse: 13.4, bias: +3.8, csi: 0.51 },
-      ecmwf: { mae: 6.1, rmse: 9.2, bias: -1.1, csi: 0.69 },
-      icon: { mae: 5.8, rmse: 8.9, bias: +0.4, csi: 0.72 },
-      equalWeight: { mae: 6.4, rmse: 9.8, bias: +1.0, csi: 0.67 },
-      varsa: { mae: 4.6, rmse: 6.9, bias: +0.2, csi: 0.81 },
+      gfs: { mae: 8.9, rmse: 13.4, bias: +3.8, csi: 0.51, pod: 0.64, far: 0.36 },
+      ecmwf: { mae: 6.1, rmse: 9.2, bias: -1.1, csi: 0.69, pod: 0.80, far: 0.20 },
+      icon: { mae: 5.8, rmse: 8.9, bias: +0.4, csi: 0.72, pod: 0.82, far: 0.18 },
+      equalWeight: { mae: 6.4, rmse: 9.8, bias: +1.0, csi: 0.67, pod: 0.78, far: 0.22 },
+      varsa: { mae: 4.6, rmse: 6.9, bias: +0.2, csi: 0.81, pod: 0.89, far: 0.12 },
       skillImprovementPercent: 28.1
     },
     west: {
-      gfs: { mae: 10.2, rmse: 15.6, bias: +4.2, csi: 0.48 },
-      ecmwf: { mae: 6.8, rmse: 10.4, bias: -1.3, csi: 0.70 },
-      icon: { mae: 6.2, rmse: 9.6, bias: +0.5, csi: 0.74 },
-      equalWeight: { mae: 7.2, rmse: 11.2, bias: +1.1, csi: 0.68 },
-      varsa: { mae: 4.9, rmse: 7.5, bias: +0.1, csi: 0.82 },
+      gfs: { mae: 10.2, rmse: 15.6, bias: +4.2, csi: 0.48, pod: 0.61, far: 0.39 },
+      ecmwf: { mae: 6.8, rmse: 10.4, bias: -1.3, csi: 0.70, pod: 0.81, far: 0.19 },
+      icon: { mae: 6.2, rmse: 9.6, bias: +0.5, csi: 0.74, pod: 0.84, far: 0.16 },
+      equalWeight: { mae: 7.2, rmse: 11.2, bias: +1.1, csi: 0.68, pod: 0.79, far: 0.21 },
+      varsa: { mae: 4.9, rmse: 7.5, bias: +0.1, csi: 0.82, pod: 0.90, far: 0.11 },
       skillImprovementPercent: 31.9
     },
     east: {
-      gfs: { mae: 7.8, rmse: 11.9, bias: +2.9, csi: 0.53 },
-      ecmwf: { mae: 5.2, rmse: 7.9, bias: -0.7, csi: 0.72 },
-      icon: { mae: 6.0, rmse: 9.1, bias: +0.6, csi: 0.66 },
-      equalWeight: { mae: 5.9, rmse: 8.9, bias: +0.9, csi: 0.68 },
-      varsa: { mae: 4.2, rmse: 6.4, bias: +0.2, csi: 0.79 },
+      gfs: { mae: 7.8, rmse: 11.9, bias: +2.9, csi: 0.53, pod: 0.66, far: 0.34 },
+      ecmwf: { mae: 5.2, rmse: 7.9, bias: -0.7, csi: 0.72, pod: 0.83, far: 0.17 },
+      icon: { mae: 6.0, rmse: 9.1, bias: +0.6, csi: 0.66, pod: 0.78, far: 0.22 },
+      equalWeight: { mae: 5.9, rmse: 8.9, bias: +0.9, csi: 0.68, pod: 0.80, far: 0.20 },
+      varsa: { mae: 4.2, rmse: 6.4, bias: +0.2, csi: 0.79, pod: 0.88, far: 0.13 },
       skillImprovementPercent: 28.8
     },
     south: {
-      gfs: { mae: 5.8, rmse: 8.7, bias: +1.9, csi: 0.58 },
-      ecmwf: { mae: 4.1, rmse: 6.3, bias: -0.5, csi: 0.74 },
-      icon: { mae: 4.7, rmse: 7.1, bias: +0.4, csi: 0.69 },
-      equalWeight: { mae: 4.5, rmse: 6.9, bias: +0.6, csi: 0.71 },
-      varsa: { mae: 3.4, rmse: 5.2, bias: +0.1, csi: 0.83 },
+      gfs: { mae: 5.8, rmse: 8.7, bias: +1.9, csi: 0.58, pod: 0.70, far: 0.30 },
+      ecmwf: { mae: 4.1, rmse: 6.3, bias: -0.5, csi: 0.74, pod: 0.84, far: 0.16 },
+      icon: { mae: 4.7, rmse: 7.1, bias: +0.4, csi: 0.69, pod: 0.80, far: 0.20 },
+      equalWeight: { mae: 4.5, rmse: 6.9, bias: +0.6, csi: 0.71, pod: 0.82, far: 0.18 },
+      varsa: { mae: 3.4, rmse: 5.2, bias: +0.1, csi: 0.83, pod: 0.91, far: 0.10 },
       skillImprovementPercent: 24.4
     },
     northeast: {
-      gfs: { mae: 12.4, rmse: 18.2, bias: +5.1, csi: 0.46 },
-      ecmwf: { mae: 8.6, rmse: 12.8, bias: -1.8, csi: 0.66 },
-      icon: { mae: 7.4, rmse: 11.1, bias: +0.9, csi: 0.73 },
-      equalWeight: { mae: 8.9, rmse: 13.4, bias: +1.4, csi: 0.65 },
-      varsa: { mae: 6.1, rmse: 9.2, bias: +0.3, csi: 0.80 },
+      gfs: { mae: 12.4, rmse: 18.2, bias: +5.1, csi: 0.46, pod: 0.58, far: 0.42 },
+      ecmwf: { mae: 8.6, rmse: 12.8, bias: -1.8, csi: 0.66, pod: 0.77, far: 0.23 },
+      icon: { mae: 7.4, rmse: 11.1, bias: +0.9, csi: 0.73, pod: 0.83, far: 0.17 },
+      equalWeight: { mae: 8.9, rmse: 13.4, bias: +1.4, csi: 0.65, pod: 0.76, far: 0.24 },
+      varsa: { mae: 6.1, rmse: 9.2, bias: +0.3, csi: 0.80, pod: 0.89, far: 0.12 },
       skillImprovementPercent: 31.4
     }
   },
   temperature: {
     north: {
-      gfs: { mae: 2.1, rmse: 2.9, bias: +0.8, csi: 0.71 },
-      ecmwf: { mae: 1.5, rmse: 2.0, bias: -0.2, csi: 0.84 },
-      icon: { mae: 1.8, rmse: 2.4, bias: +0.3, csi: 0.78 },
-      equalWeight: { mae: 1.6, rmse: 2.2, bias: +0.3, csi: 0.81 },
-      varsa: { mae: 1.2, rmse: 1.6, bias: +0.0, csi: 0.89 },
+      gfs: { mae: 2.1, rmse: 2.9, bias: +0.8, csi: 0.71, pod: 0.78, far: 0.22 },
+      ecmwf: { mae: 1.5, rmse: 2.0, bias: -0.2, csi: 0.84, pod: 0.90, far: 0.10 },
+      icon: { mae: 1.8, rmse: 2.4, bias: +0.3, csi: 0.78, pod: 0.85, far: 0.15 },
+      equalWeight: { mae: 1.6, rmse: 2.2, bias: +0.3, csi: 0.81, pod: 0.87, far: 0.13 },
+      varsa: { mae: 1.2, rmse: 1.6, bias: +0.0, csi: 0.89, pod: 0.94, far: 0.07 },
       skillImprovementPercent: 25.0
     },
     central: {
-      gfs: { mae: 2.4, rmse: 3.2, bias: +1.1, csi: 0.68 },
-      ecmwf: { mae: 1.6, rmse: 2.1, bias: -0.3, csi: 0.82 },
-      icon: { mae: 1.9, rmse: 2.5, bias: +0.4, csi: 0.76 },
-      equalWeight: { mae: 1.7, rmse: 2.3, bias: +0.4, csi: 0.79 },
-      varsa: { mae: 1.3, rmse: 1.7, bias: +0.1, csi: 0.88 },
+      gfs: { mae: 2.4, rmse: 3.2, bias: +1.1, csi: 0.68, pod: 0.75, far: 0.25 },
+      ecmwf: { mae: 1.6, rmse: 2.1, bias: -0.3, csi: 0.82, pod: 0.88, far: 0.12 },
+      icon: { mae: 1.9, rmse: 2.5, bias: +0.4, csi: 0.76, pod: 0.83, far: 0.17 },
+      equalWeight: { mae: 1.7, rmse: 2.3, bias: +0.4, csi: 0.79, pod: 0.85, far: 0.15 },
+      varsa: { mae: 1.3, rmse: 1.7, bias: +0.1, csi: 0.88, pod: 0.93, far: 0.08 },
       skillImprovementPercent: 23.5
     },
     west: {
-      gfs: { mae: 1.9, rmse: 2.6, bias: +0.7, csi: 0.73 },
-      ecmwf: { mae: 1.3, rmse: 1.8, bias: -0.2, csi: 0.86 },
-      icon: { mae: 1.6, rmse: 2.2, bias: +0.2, csi: 0.80 },
-      equalWeight: { mae: 1.5, rmse: 2.0, bias: +0.2, csi: 0.83 },
-      varsa: { mae: 1.1, rmse: 1.5, bias: +0.0, csi: 0.91 },
+      gfs: { mae: 1.9, rmse: 2.6, bias: +0.7, csi: 0.73, pod: 0.80, far: 0.20 },
+      ecmwf: { mae: 1.3, rmse: 1.8, bias: -0.2, csi: 0.86, pod: 0.91, far: 0.09 },
+      icon: { mae: 1.6, rmse: 2.2, bias: +0.2, csi: 0.80, pod: 0.86, far: 0.14 },
+      equalWeight: { mae: 1.5, rmse: 2.0, bias: +0.2, csi: 0.83, pod: 0.88, far: 0.12 },
+      varsa: { mae: 1.1, rmse: 1.5, bias: +0.0, csi: 0.91, pod: 0.95, far: 0.06 },
       skillImprovementPercent: 26.6
     },
     east: {
-      gfs: { mae: 2.0, rmse: 2.8, bias: +0.8, csi: 0.70 },
-      ecmwf: { mae: 1.4, rmse: 1.9, bias: -0.3, csi: 0.84 },
-      icon: { mae: 1.7, rmse: 2.3, bias: +0.3, csi: 0.77 },
-      equalWeight: { mae: 1.5, rmse: 2.1, bias: +0.3, csi: 0.80 },
-      varsa: { mae: 1.2, rmse: 1.6, bias: +0.0, csi: 0.88 },
+      gfs: { mae: 2.0, rmse: 2.8, bias: +0.8, csi: 0.70, pod: 0.77, far: 0.23 },
+      ecmwf: { mae: 1.4, rmse: 1.9, bias: -0.3, csi: 0.84, pod: 0.89, far: 0.11 },
+      icon: { mae: 1.7, rmse: 2.3, bias: +0.3, csi: 0.77, pod: 0.84, far: 0.16 },
+      equalWeight: { mae: 1.5, rmse: 2.1, bias: +0.3, csi: 0.80, pod: 0.86, far: 0.14 },
+      varsa: { mae: 1.2, rmse: 1.6, bias: +0.0, csi: 0.88, pod: 0.93, far: 0.08 },
       skillImprovementPercent: 20.0
     },
     south: {
-      gfs: { mae: 1.7, rmse: 2.3, bias: +0.6, csi: 0.76 },
-      ecmwf: { mae: 1.2, rmse: 1.6, bias: -0.2, csi: 0.88 },
-      icon: { mae: 1.4, rmse: 1.9, bias: +0.2, csi: 0.83 },
-      equalWeight: { mae: 1.3, rmse: 1.8, bias: +0.2, csi: 0.85 },
-      varsa: { mae: 0.9, rmse: 1.3, bias: +0.0, csi: 0.93 },
+      gfs: { mae: 1.7, rmse: 2.3, bias: +0.6, csi: 0.76, pod: 0.82, far: 0.18 },
+      ecmwf: { mae: 1.2, rmse: 1.6, bias: -0.2, csi: 0.88, pod: 0.92, far: 0.08 },
+      icon: { mae: 1.4, rmse: 1.9, bias: +0.2, csi: 0.83, pod: 0.88, far: 0.12 },
+      equalWeight: { mae: 1.3, rmse: 1.8, bias: +0.2, csi: 0.85, pod: 0.90, far: 0.10 },
+      varsa: { mae: 0.9, rmse: 1.3, bias: +0.0, csi: 0.93, pod: 0.96, far: 0.05 },
       skillImprovementPercent: 30.7
     },
     northeast: {
-      gfs: { mae: 2.6, rmse: 3.5, bias: +1.2, csi: 0.65 },
-      ecmwf: { mae: 1.8, rmse: 2.4, bias: -0.4, csi: 0.80 },
-      icon: { mae: 1.9, rmse: 2.6, bias: +0.3, csi: 0.78 },
-      equalWeight: { mae: 1.9, rmse: 2.6, bias: +0.4, csi: 0.78 },
-      varsa: { mae: 1.4, rmse: 1.9, bias: +0.1, csi: 0.86 },
+      gfs: { mae: 2.6, rmse: 3.5, bias: +1.2, csi: 0.65, pod: 0.72, far: 0.28 },
+      ecmwf: { mae: 1.8, rmse: 2.4, bias: -0.4, csi: 0.80, pod: 0.86, far: 0.14 },
+      icon: { mae: 1.9, rmse: 2.6, bias: +0.3, csi: 0.78, pod: 0.84, far: 0.16 },
+      equalWeight: { mae: 1.9, rmse: 2.6, bias: +0.4, csi: 0.78, pod: 0.84, far: 0.16 },
+      varsa: { mae: 1.4, rmse: 1.9, bias: +0.1, csi: 0.86, pod: 0.91, far: 0.09 },
       skillImprovementPercent: 26.3
     }
   },
   wind_speed: {
     north: {
-      gfs: { mae: 5.6, rmse: 7.8, bias: -1.2, csi: 0.61 },
-      ecmwf: { mae: 4.4, rmse: 6.2, bias: +0.5, csi: 0.73 },
-      icon: { mae: 4.1, rmse: 5.8, bias: -0.2, csi: 0.76 },
-      equalWeight: { mae: 4.4, rmse: 6.2, bias: -0.3, csi: 0.72 },
-      varsa: { mae: 3.3, rmse: 4.7, bias: +0.1, csi: 0.84 },
+      gfs: { mae: 5.6, rmse: 7.8, bias: -1.2, csi: 0.61, pod: 0.71, far: 0.29 },
+      ecmwf: { mae: 4.4, rmse: 6.2, bias: +0.5, csi: 0.73, pod: 0.82, far: 0.18 },
+      icon: { mae: 4.1, rmse: 5.8, bias: -0.2, csi: 0.76, pod: 0.85, far: 0.15 },
+      equalWeight: { mae: 4.4, rmse: 6.2, bias: -0.3, csi: 0.72, pod: 0.81, far: 0.19 },
+      varsa: { mae: 3.3, rmse: 4.7, bias: +0.1, csi: 0.84, pod: 0.91, far: 0.10 },
       skillImprovementPercent: 25.0
     },
     central: {
-      gfs: { mae: 5.2, rmse: 7.4, bias: -1.0, csi: 0.63 },
-      ecmwf: { mae: 4.1, rmse: 5.9, bias: +0.4, csi: 0.75 },
-      icon: { mae: 3.8, rmse: 5.4, bias: -0.2, csi: 0.78 },
-      equalWeight: { mae: 4.1, rmse: 5.8, bias: -0.3, csi: 0.74 },
-      varsa: { mae: 3.1, rmse: 4.4, bias: +0.0, csi: 0.85 },
+      gfs: { mae: 5.2, rmse: 7.4, bias: -1.0, csi: 0.63, pod: 0.73, far: 0.27 },
+      ecmwf: { mae: 4.1, rmse: 5.9, bias: +0.4, csi: 0.75, pod: 0.84, far: 0.16 },
+      icon: { mae: 3.8, rmse: 5.4, bias: -0.2, csi: 0.78, pod: 0.87, far: 0.13 },
+      equalWeight: { mae: 4.1, rmse: 5.8, bias: -0.3, csi: 0.74, pod: 0.83, far: 0.17 },
+      varsa: { mae: 3.1, rmse: 4.4, bias: +0.0, csi: 0.85, pod: 0.92, far: 0.09 },
       skillImprovementPercent: 24.3
     },
     west: {
-      gfs: { mae: 6.9, rmse: 9.8, bias: -1.8, csi: 0.58 },
-      ecmwf: { mae: 5.2, rmse: 7.3, bias: +0.6, csi: 0.74 },
-      icon: { mae: 4.5, rmse: 6.4, bias: -0.3, csi: 0.80 },
-      equalWeight: { mae: 5.1, rmse: 7.2, bias: -0.5, csi: 0.74 },
-      varsa: { mae: 3.7, rmse: 5.2, bias: +0.1, csi: 0.87 },
+      gfs: { mae: 6.9, rmse: 9.8, bias: -1.8, csi: 0.58, pod: 0.68, far: 0.32 },
+      ecmwf: { mae: 5.2, rmse: 7.3, bias: +0.6, csi: 0.74, pod: 0.83, far: 0.17 },
+      icon: { mae: 4.5, rmse: 6.4, bias: -0.3, csi: 0.80, pod: 0.88, far: 0.12 },
+      equalWeight: { mae: 5.1, rmse: 7.2, bias: -0.5, csi: 0.74, pod: 0.83, far: 0.17 },
+      varsa: { mae: 3.7, rmse: 5.2, bias: +0.1, csi: 0.87, pod: 0.93, far: 0.08 },
       skillImprovementPercent: 27.4
     },
     east: {
-      gfs: { mae: 6.5, rmse: 9.2, bias: -1.5, csi: 0.59 },
-      ecmwf: { mae: 4.9, rmse: 6.9, bias: +0.5, csi: 0.76 },
-      icon: { mae: 4.6, rmse: 6.5, bias: -0.2, csi: 0.78 },
-      equalWeight: { mae: 4.9, rmse: 7.0, bias: -0.4, csi: 0.75 },
-      varsa: { mae: 3.8, rmse: 5.4, bias: +0.0, csi: 0.86 },
+      gfs: { mae: 6.5, rmse: 9.2, bias: -1.5, csi: 0.59, pod: 0.70, far: 0.30 },
+      ecmwf: { mae: 4.9, rmse: 6.9, bias: +0.5, csi: 0.76, pod: 0.85, far: 0.15 },
+      icon: { mae: 4.6, rmse: 6.5, bias: -0.2, csi: 0.78, pod: 0.87, far: 0.13 },
+      equalWeight: { mae: 4.9, rmse: 7.0, bias: -0.4, csi: 0.75, pod: 0.84, far: 0.16 },
+      varsa: { mae: 3.8, rmse: 5.4, bias: +0.0, csi: 0.86, pod: 0.92, far: 0.09 },
       skillImprovementPercent: 22.4
     },
     south: {
-      gfs: { mae: 5.4, rmse: 7.6, bias: -1.1, csi: 0.64 },
-      ecmwf: { mae: 4.2, rmse: 6.0, bias: +0.4, csi: 0.76 },
-      icon: { mae: 3.9, rmse: 5.6, bias: -0.1, csi: 0.79 },
-      equalWeight: { mae: 4.2, rmse: 6.0, bias: -0.3, csi: 0.75 },
-      varsa: { mae: 3.2, rmse: 4.6, bias: +0.0, csi: 0.85 },
+      gfs: { mae: 5.4, rmse: 7.6, bias: -1.1, csi: 0.64, pod: 0.74, far: 0.26 },
+      ecmwf: { mae: 4.2, rmse: 6.0, bias: +0.4, csi: 0.76, pod: 0.85, far: 0.15 },
+      icon: { mae: 3.9, rmse: 5.6, bias: -0.1, csi: 0.79, pod: 0.88, far: 0.12 },
+      equalWeight: { mae: 4.2, rmse: 6.0, bias: -0.3, csi: 0.75, pod: 0.84, far: 0.16 },
+      varsa: { mae: 3.2, rmse: 4.6, bias: +0.0, csi: 0.85, pod: 0.92, far: 0.09 },
       skillImprovementPercent: 23.8
     },
     northeast: {
-      gfs: { mae: 7.2, rmse: 10.4, bias: -2.1, csi: 0.54 },
-      ecmwf: { mae: 5.6, rmse: 7.9, bias: +0.7, csi: 0.71 },
-      icon: { mae: 4.8, rmse: 6.9, bias: -0.4, csi: 0.77 },
-      equalWeight: { mae: 5.5, rmse: 7.8, bias: -0.6, csi: 0.72 },
-      varsa: { mae: 4.0, rmse: 5.7, bias: +0.1, csi: 0.84 },
+      gfs: { mae: 7.2, rmse: 10.4, bias: -2.1, csi: 0.54, pod: 0.65, far: 0.35 },
+      ecmwf: { mae: 5.6, rmse: 7.9, bias: +0.7, csi: 0.71, pod: 0.81, far: 0.19 },
+      icon: { mae: 4.8, rmse: 6.9, bias: -0.4, csi: 0.77, pod: 0.86, far: 0.14 },
+      equalWeight: { mae: 5.5, rmse: 7.8, bias: -0.6, csi: 0.72, pod: 0.82, far: 0.18 },
+      varsa: { mae: 4.0, rmse: 5.7, bias: +0.1, csi: 0.84, pod: 0.91, far: 0.10 },
       skillImprovementPercent: 27.2
     }
   }
@@ -603,72 +621,78 @@ export const VERIFICATION_DATA: Record<VariableId, Record<RegionId, Verification
  */
 export const EXTREME_WEATHER_EVENTS: ExtremeWeatherEvent[] = [
   {
-    id: 'rain-konkan-01',
+    id: 'rain-central-01',
     type: 'heavy_rain',
-    title: 'Extremely Heavy Rainfall Warning (Konkan & Ghats)',
-    regionId: 'west',
-    regionName: 'West India',
-    leadTime: '48h',
-    signalValue: '172.4 mm / 24h (Blended)',
-    threshold: '> 115.5 mm (Very Heavy)',
-    severity: 'Severe Warning',
-    probability: 88,
-    modelConsensus: 'GFS predicts 210mm (over-predictive), ECMWF 145mm, ICON 180mm. VARSA weighted consensus stabilizes at 172.4mm.',
-    operationalGuidance: 'Trigger National Disaster Response Force (NDRF) stage-2 staging in Ratnagiri, Raigad, and Pune ghat catchment zones. Suspend high-altitude ghat transport.',
-    affectedDistricts: ['Ratnagiri', 'Sindhudurg', 'Raigad', 'Satara Ghats', 'Kolhapur']
-  },
-  {
-    id: 'heat-vidarbha-02',
-    type: 'heat',
-    title: 'Severe Heatwave Alert (Vidarbha & West MP)',
+    title: 'Heavy Rainfall Advisory (Central Vidarbha & Narmada Valley)',
     regionId: 'central',
     regionName: 'Central India',
-    leadTime: '72h',
-    signalValue: '45.8 °C (Blended Peak)',
-    threshold: '≥ 45.0 °C or Departure > +4.5 °C',
+    leadTime: '24h',
+    signalLabel: 'Elevated Signal',
+    signalValue: '94.2 mm / 24h (Blended)',
+    threshold: '> 64.5 mm (Heavy Rainfall)',
     severity: 'Warning',
-    probability: 82,
-    modelConsensus: 'GFS indicates 47.1°C, ECMWF indicates 44.9°C, ICON indicates 45.4°C. VARSA adaptive weighting favors ECMWF boundary layer physics (45.8°C).',
-    operationalGuidance: 'Issue red health advisory for district hospitals; mandate suspension of outdoor construction between 11:30 and 16:00 IST. Activate urban water misting stations.',
-    affectedDistricts: ['Nagpur', 'Chandrapur', 'Akola', 'Wardha', 'Hoshangabad']
+    probability: 84,
+    modelConsensus: 'GFS predicts 126mm (systematic wet bias), ECMWF indicates 82mm, ICON indicates 89mm. VARSA adaptive weighting (ECMWF 46%, GFS 32%, ICON 22%) filters over-prediction to 94.2mm.',
+    operationalGuidance: 'Elevated signal for localized waterlogging in Nagpur, Wardha, and Betul drainage basins. Alert local disaster management teams for short-fuse urban culvert backflows.',
+    affectedDistricts: ['Nagpur', 'Wardha', 'Betul', 'Chhindwara', 'Hoshangabad']
   },
   {
-    id: 'wind-odisha-03',
-    type: 'high_wind',
-    title: 'Coastal Gale & Squall Hazard (Bay of Bengal Coast)',
-    regionId: 'east',
-    regionName: 'East India',
+    id: 'heat-northwest-02',
+    type: 'heat',
+    title: 'Severe Heat Condition Advisory (Northwest Plains & Thar Belt)',
+    regionId: 'north',
+    regionName: 'Northwest India',
     leadTime: '48h',
-    signalValue: '68.5 km/h gusts to 82 km/h',
-    threshold: '≥ 55 km/h (Gale Force)',
+    signalLabel: 'Moderate Signal',
+    signalValue: '44.8 °C (Blended Peak)',
+    threshold: '≥ 44.0 °C (Heatwave Threshold)',
+    severity: 'Warning',
+    probability: 78,
+    modelConsensus: 'GFS indicates 46.2°C dry boundary layer spike; ECMWF projects 44.1°C; ICON projects 44.5°C. VARSA blend stabilizes at 44.8°C with moderate confidence.',
+    operationalGuidance: 'Issue public health advisory for vulnerable populations; restrict direct sun exposure during peak thermal window (12:00-15:30 IST); activate municipal cooling points.',
+    affectedDistricts: ['Bikaner', 'Churu', 'Hisar', 'Bathinda', 'Ganganagar']
+  },
+  {
+    id: 'wind-westcoast-03',
+    type: 'high_wind',
+    title: 'High Coastal Wind & Swell Warning (West Coast & Konkan)',
+    regionId: 'west',
+    regionName: 'West Coast',
+    leadTime: '24h',
+    signalLabel: 'Watch',
+    signalValue: '58.4 km/h gusts to 72 km/h',
+    threshold: '≥ 45.0 km/h (Sustained Coastal Gale)',
     severity: 'Watch',
-    probability: 74,
-    modelConsensus: 'ECMWF track projects coastal landfall 40km south of Puri; GFS projects recurvature towards Sundarbans. VARSA weights ECMWF 50% for coastal track agreement.',
-    operationalGuidance: 'Issue comprehensive fishermen warning along Odisha and North Andhra coasts. Hoist Local Cautionary Signal No. 3 at Paradip and Gopalpur ports.',
-    affectedDistricts: ['Puri', 'Ganjam', 'Jagatsinghpur', 'Kendrapara', 'Bhadrak']
+    probability: 72,
+    modelConsensus: 'ECMWF and ICON align on strong low-level westerly monsoon jet along coastal shelf; GFS slightly underestimates coastal convergence shear.',
+    operationalGuidance: 'Issue precautionary maritime bulletin; advise small craft and artisanal fishing vessels along Mumbai, Raigad, and Ratnagiri to refrain from deep offshore operations.',
+    affectedDistricts: ['Mumbai Suburban', 'Raigad', 'Ratnagiri', 'Sindhudurg', 'Goa Coast']
   },
   {
     id: 'rain-assam-04',
     type: 'heavy_rain',
-    title: 'Flash Flood & Inundation Watch (Brahmaputra Basin)',
+    title: 'Convective Flash Inundation Signal (Brahmaputra Valley)',
     regionId: 'northeast',
     regionName: 'Northeast India',
     leadTime: '24h',
+    signalLabel: 'Elevated Signal',
     signalValue: '128.0 mm / 24h',
     threshold: '> 64.5 mm (Heavy)',
     severity: 'Warning',
     probability: 79,
     modelConsensus: 'ICON fine-mesh resolution detects rapid south-westerly moisture convergence against Meghalaya escarpment; GFS underestimates localized orography.',
-    operationalGuidance: 'Alert State Disaster Management Authority (ASDMA) for river level rise in Kopili, Dhansiri, and Jia Bharali tributaries. Pre-position boat rescue squads.',
+    operationalGuidance: 'Alert State Disaster Management Authority (ASDMA) for river level rise in Kopili, Dhansiri, and Jia Bharali tributaries. Pre-position localized water rescue units.',
     affectedDistricts: ['Kamrup Metro', 'Morigaon', 'Nagaon', 'Darrang', 'Sonitpur']
   }
 ];
 
 /**
  * Processing Pipeline Simulation Steps
+ * Exact 6-stage analytical pipeline sequence
  */
 export interface PipelineStep {
   id: number;
+  stepNumber: string;
   label: string;
   detail: string;
   durationMs: number;
@@ -678,44 +702,50 @@ export interface PipelineStep {
 export const PIPELINE_STEPS: PipelineStep[] = [
   {
     id: 1,
-    label: 'Forecast Ingestion',
-    detail: 'Streaming raw GRIB2 datasets: GFS 0.25°, ECMWF IFS 0.1°, ICON 13km',
-    durationMs: 400,
+    stepNumber: '01',
+    label: 'Model forecast ingestion',
+    detail: 'Streaming raw GRIB2 datasets: NOAA GFS 0.25°, ECMWF IFS 0.1°, DWD ICON 13km',
+    durationMs: 420,
     metric: '3 Numerical Models Ingested'
   },
   {
     id: 2,
-    label: 'Data Harmonization',
-    detail: 'Reprojecting and bilinear spatial interpolating to unified 0.1° South Asia grid',
-    durationMs: 450,
+    stepNumber: '02',
+    label: 'Data harmonization',
+    detail: 'Reprojecting, bilinear spatial interpolation, and vertical grid unification to 0.1° South Asia grid',
+    durationMs: 440,
     metric: 'Unified 0.1° Geodetic Grid'
   },
   {
     id: 3,
-    label: 'Context Analysis',
-    detail: 'Evaluating synoptic regime, terrain orography mask, and 14-day rolling bias',
-    durationMs: 450,
+    stepNumber: '03',
+    label: 'Context analysis',
+    detail: 'Classifying synoptic regime, orographic land-sea mask, and rolling 14-day regional bias patterns',
+    durationMs: 460,
     metric: 'Regime Classified: Active Trough'
   },
   {
     id: 4,
-    label: 'Adaptive Weighting',
-    detail: 'Evaluating XGBoost loss-minimization contextual matrix across forecast lead-times',
-    durationMs: 500,
-    metric: 'Weight Matrix Calibrated'
+    stepNumber: '04',
+    label: 'Adaptive weighting',
+    detail: 'Evaluating contextual loss-minimization weighting matrix across forecast lead-times',
+    durationMs: 480,
+    metric: 'Weights Calibrated: ECMWF 46% · GFS 32% · ICON 22%'
   },
   {
     id: 5,
-    label: 'Forecast Blending',
-    detail: 'Applying non-linear ensemble weighting with mass & thermodynamic conservation',
-    durationMs: 400,
-    metric: 'VARSA Surface Generated'
+    stepNumber: '05',
+    label: 'Forecast blending',
+    detail: 'Synthesizing adaptive multi-model blended surface with thermodynamic conservation',
+    durationMs: 420,
+    metric: 'VARSA Blend Surface Generated'
   },
   {
     id: 6,
-    label: 'Verification & Quality Check',
-    detail: 'Comparing against recent Doppler/AWS observational network truths',
-    durationMs: 350,
-    metric: 'MAE Improvement Verified'
+    stepNumber: '06',
+    label: 'Verification',
+    detail: 'Evaluating blended surface against automated AWS/radar ground truth references',
+    durationMs: 380,
+    metric: 'Verification Quality Passed'
   }
 ];

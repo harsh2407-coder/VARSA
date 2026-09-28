@@ -37,7 +37,7 @@ export const BlendPipelineModal: React.FC<BlendPipelineModalProps> = ({
         setIsFinished(true);
         timeoutId = setTimeout(() => {
           onComplete();
-        }, 600);
+        }, 1400);
         return;
       }
 
@@ -71,14 +71,13 @@ export const BlendPipelineModal: React.FC<BlendPipelineModalProps> = ({
               </p>
             </div>
           </div>
-          {isFinished && (
-            <button
-              onClick={onClose}
-              className="text-slate-400 hover:text-white transition-colors p-1"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-white transition-colors p-1 cursor-pointer"
+            title="Close Pipeline Execution"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Pipeline Execution Body */}
@@ -106,19 +105,19 @@ export const BlendPipelineModal: React.FC<BlendPipelineModalProps> = ({
                     ) : isCurrent ? (
                       <Loader2 className="w-4 h-4 text-sky-600 animate-spin" />
                     ) : (
-                      <span className="w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center text-[10px] font-mono text-slate-400">
-                        {step.id}
+                      <span className="w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center text-[10px] font-mono text-slate-400">
+                        {step.stepNumber}
                       </span>
                     )}
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold">
-                        Step {step.id}: {step.label}
+                      <span className="text-xs font-bold font-mono text-slate-800">
+                        {step.stepNumber} <span className="font-sans font-semibold text-slate-900">{step.label}</span>
                       </span>
                       {isCompleted && (
-                        <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+                        <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
                           {step.metric}
                         </span>
                       )}

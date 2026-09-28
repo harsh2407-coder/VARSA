@@ -266,6 +266,41 @@ export const ModelWeightMapScreen: React.FC<ModelWeightMapScreenProps> = ({
               })}
             </div>
           </div>
+
+          {/* Key Concept: Regional Model Contribution Differences Callout */}
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-2.5 text-xs">
+            <div className="flex items-center justify-between border-b border-slate-200/80 pb-1.5">
+              <span className="font-mono font-bold uppercase text-slate-800 text-[11px] tracking-wider">
+                Regional Allocation Concept
+              </span>
+              <span className="text-[10px] font-mono text-sky-800 bg-sky-100/70 border border-sky-200 px-1.5 py-0.2 rounded font-semibold">
+                Demonstration States
+              </span>
+            </div>
+
+            <p className="text-slate-600 leading-relaxed">
+              <strong>Core Idea:</strong> Different geographic regions receive different model contributions based on local terrain, synoptic patterns, and historical skill.
+            </p>
+
+            <div className="grid grid-cols-1 gap-1.5 font-mono text-[11px]">
+              <div className="flex items-center justify-between p-2 rounded bg-white border border-slate-200">
+                <span className="font-semibold text-slate-800">North India</span>
+                <span className="text-blue-700 font-bold">&rarr; ECMWF Dominant (52%)</span>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded bg-white border border-slate-200">
+                <span className="font-semibold text-slate-800">Central India</span>
+                <span className="text-slate-700 font-bold">&rarr; ICON / GFS Balance (40% / 32%)</span>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded bg-white border border-slate-200">
+                <span className="font-semibold text-slate-800">South India</span>
+                <span className="text-blue-700 font-bold">&rarr; ECMWF Dominant (48%)</span>
+              </div>
+            </div>
+
+            <div className="text-[10px] text-slate-400 font-mono pt-1">
+              * Demonstration values illustrate spatial weight variation. Not measured real-world performance.
+            </div>
+          </div>
         </div>
       </div>
     </div>
