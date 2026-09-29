@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { PIPELINE_STEPS, RegionInfo, VariableInfo, LeadTimeInfo, WeatherRegimeInfo } from '../data/varsaData';
+import { PIPELINE_STEPS, RegionInfo, VariableInfo, LeadTimeInfo, WeatherRegimeInfo, ModelWeights } from '../data/varsaData';
 import { CheckCircle2, Loader2, Sparkles, X } from 'lucide-react';
 
 interface BlendPipelineModalProps {
@@ -10,6 +10,8 @@ interface BlendPipelineModalProps {
   variable: VariableInfo;
   leadTime: LeadTimeInfo;
   regime: WeatherRegimeInfo;
+  weights?: ModelWeights;
+  blendedForecast?: number;
 }
 
 export const BlendPipelineModal: React.FC<BlendPipelineModalProps> = ({
@@ -19,7 +21,9 @@ export const BlendPipelineModal: React.FC<BlendPipelineModalProps> = ({
   region,
   variable,
   leadTime,
-  regime
+  regime,
+  weights,
+  blendedForecast
 }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const [isFinished, setIsFinished] = useState<boolean>(false);
@@ -63,9 +67,11 @@ export const BlendPipelineModal: React.FC<BlendPipelineModalProps> = ({
         {/* Header */}
         <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-sky-400 animate-pulse"></span>
+            <span className={`w-2.5 h-2.5 rounded-full ${isFinished ? 'bg-emerald-400' : 'bg-sky-400 animate-pulse'}`}></span>
             <div>
-              <h3 className="text-sm font-bold tracking-tight">VARSA COMPUTATIONAL BLEND PIPELINE</h3>
+              <h3 className="text-sm font-bold tracking-tight">
+                {isFinished ? 'VARSA DEMONSTRATION RUN COMPLETE' : 'VARSA DEMONSTRATION BLEND PIPELINE'}
+              </h3>
               <p className="text-[11px] font-mono text-slate-300">
                 {region.name} · {variable.name} · {leadTime.label}
               </p>
@@ -118,7 +124,11 @@ export const BlendPipelineModal: React.FC<BlendPipelineModalProps> = ({
                       </span>
                       {isCompleted && (
                         <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
-                          {step.metric}
+                          {step.id === 4 && weights
+                            ? `ECMWF ${Math.round(weights.ecmwf * 100)}% • GFS ${Math.round(weights.gfs * 100)}% • ICON ${Math.round(weights.icon * 100)}%`
+                            : step.id === 5 && blendedForecast !== undefined
+                            ? `Blended: ${blendedForecast} ${variable.unit}`
+                            : step.metric}
                         </span>
                       )}
                     </div>
@@ -131,11 +141,22 @@ export const BlendPipelineModal: React.FC<BlendPipelineModalProps> = ({
             })}
           </div>
 
+          {/* Completion state notification */}
+          {isFinished && (
+            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded text-xs font-mono text-emerald-900 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span className="font-bold">VARSA DEMONSTRATION RUN COMPLETE</span>
+              </div>
+              <span className="text-[11px] text-emerald-700">Demonstration fields generated</span>
+            </div>
+          )}
+
           {/* Progress Bar */}
           <div className="space-y-1 pt-2 border-t border-slate-100">
             <div className="flex justify-between text-[11px] font-mono text-slate-500">
-              <span>Scientific Processing Progress</span>
-              <span>{Math.round(((currentStepIndex + (isFinished ? 1 : 0)) / PIPELINE_STEPS.length) * 100)}%</span>
+              <span>{isFinished ? 'Demonstration Run Complete' : 'Demonstration Pipeline Progress'}</span>
+              <span>{isFinished ? '100%' : `${Math.round(((currentStepIndex + (isFinished ? 1 : 0)) / PIPELINE_STEPS.length) * 100)}%`}</span>
             </div>
             <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
               <div

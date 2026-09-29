@@ -7,9 +7,9 @@ import {
   REGIONS,
   VARIABLES,
   LEAD_TIMES,
-  WEATHER_REGIMES,
-  getForecastTimeSeries
+  WEATHER_REGIMES
 } from '../data/varsaData';
+import { runVarsaDemo } from '../lib/varsaEngine';
 import { ForecastChart } from './ForecastChart';
 import { ArrowRight, Layers, HelpCircle } from 'lucide-react';
 
@@ -37,14 +37,17 @@ export const ForecastBlendingScreen: React.FC<ForecastBlendingScreenProps> = ({
 
   const [selectedLeadHour, setSelectedLeadHour] = useState<number>(currentLeadTime.hours);
 
-  const { points, weights, summary } = getForecastTimeSeries(
+  // Consume Central VARSA Demonstration Engine (Single Source of Truth)
+  const engineResult = runVarsaDemo({
     region,
     variable,
     leadTime,
-    regime
-  );
+    weatherRegime: regime
+  });
 
-  const selectedPoint = points.find(p => p.hours === selectedLeadHour) || points[1];
+  const points = engineResult.timeSeries;
+  const weights = engineResult.weights;
+  const selectedPoint = points.find(p => p.hours === selectedLeadHour) || engineResult.activePoint;
 
   return (
     <div className="space-y-6">
@@ -92,7 +95,7 @@ export const ForecastBlendingScreen: React.FC<ForecastBlendingScreenProps> = ({
               {currentVariable.name} Evolution (0h to 144h)
             </h3>
             <p className="text-xs text-slate-500">
-              Click any timestep or axis column to inspect member divergence and ground truth delta
+              Click any timestep or axis column to inspect member divergence and observation reference delta
             </p>
           </div>
 
@@ -116,10 +119,10 @@ export const ForecastBlendingScreen: React.FC<ForecastBlendingScreenProps> = ({
 
         {/* Equation & Weight Transformation Strip */}
         <div className="bg-slate-50 border border-slate-200 p-3.5 rounded flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
-          <div className="flex items-center gap-2 text-slate-700">
+          <div className="flex flex-wrap items-center gap-2 text-slate-700">
             <span className="font-semibold text-slate-900">BLENDING EQUATION:</span>
             <span className="font-mono text-[11px] bg-white px-2 py-1 border border-slate-200 rounded">
-              VARSA = ({weights.gfs} × GFS) + ({weights.ecmwf} × ECMWF) + ({weights.icon} × ICON)
+              VARSA = ({weights.gfs} × {selectedPoint.gfs}) + ({weights.ecmwf} × {selectedPoint.ecmwf}) + ({weights.icon} × {selectedPoint.icon}) = <strong className="text-sky-900">{selectedPoint.varsa}</strong> {currentVariable.unit}
             </span>
           </div>
 
@@ -129,6 +132,8 @@ export const ForecastBlendingScreen: React.FC<ForecastBlendingScreenProps> = ({
             <span>ECMWF: {Math.round(weights.ecmwf * 100)}%</span>
             <span className="text-slate-300">|</span>
             <span>ICON: {Math.round(weights.icon * 100)}%</span>
+            <span className="text-slate-300">|</span>
+            <span className="text-emerald-700 font-bold">Σ = 100%</span>
           </div>
         </div>
       </div>
@@ -151,7 +156,7 @@ export const ForecastBlendingScreen: React.FC<ForecastBlendingScreenProps> = ({
               {selectedPoint.gfs} <span className="text-xs font-normal text-amber-800">{currentVariable.unit}</span>
             </div>
             <div className="text-[11px] text-amber-800/80 mt-1">
-              Delta vs Truth: {Math.round((selectedPoint.gfs - selectedPoint.observation) * 10) / 10 > 0 ? `+${Math.round((selectedPoint.gfs - selectedPoint.observation) * 10) / 10}` : Math.round((selectedPoint.gfs - selectedPoint.observation) * 10) / 10}
+              Delta vs Ref: {Math.round((selectedPoint.gfs - selectedPoint.observation) * 10) / 10 > 0 ? `+${Math.round((selectedPoint.gfs - selectedPoint.observation) * 10) / 10}` : Math.round((selectedPoint.gfs - selectedPoint.observation) * 10) / 10}
             </div>
           </div>
 
@@ -165,7 +170,7 @@ export const ForecastBlendingScreen: React.FC<ForecastBlendingScreenProps> = ({
               {selectedPoint.ecmwf} <span className="text-xs font-normal text-blue-800">{currentVariable.unit}</span>
             </div>
             <div className="text-[11px] text-blue-800/80 mt-1">
-              Delta vs Truth: {Math.round((selectedPoint.ecmwf - selectedPoint.observation) * 10) / 10 > 0 ? `+${Math.round((selectedPoint.ecmwf - selectedPoint.observation) * 10) / 10}` : Math.round((selectedPoint.ecmwf - selectedPoint.observation) * 10) / 10}
+              Delta vs Ref: {Math.round((selectedPoint.ecmwf - selectedPoint.observation) * 10) / 10 > 0 ? `+${Math.round((selectedPoint.ecmwf - selectedPoint.observation) * 10) / 10}` : Math.round((selectedPoint.ecmwf - selectedPoint.observation) * 10) / 10}
             </div>
           </div>
 
@@ -179,7 +184,7 @@ export const ForecastBlendingScreen: React.FC<ForecastBlendingScreenProps> = ({
               {selectedPoint.icon} <span className="text-xs font-normal text-emerald-800">{currentVariable.unit}</span>
             </div>
             <div className="text-[11px] text-emerald-800/80 mt-1">
-              Delta vs Truth: {Math.round((selectedPoint.icon - selectedPoint.observation) * 10) / 10 > 0 ? `+${Math.round((selectedPoint.icon - selectedPoint.observation) * 10) / 10}` : Math.round((selectedPoint.icon - selectedPoint.observation) * 10) / 10}
+              Delta vs Ref: {Math.round((selectedPoint.icon - selectedPoint.observation) * 10) / 10 > 0 ? `+${Math.round((selectedPoint.icon - selectedPoint.observation) * 10) / 10}` : Math.round((selectedPoint.icon - selectedPoint.observation) * 10) / 10}
             </div>
           </div>
 
@@ -193,7 +198,7 @@ export const ForecastBlendingScreen: React.FC<ForecastBlendingScreenProps> = ({
               {selectedPoint.equalWeight} <span className="text-xs font-normal text-slate-500">{currentVariable.unit}</span>
             </div>
             <div className="text-[11px] text-slate-500 mt-1">
-              Delta vs Truth: {Math.round((selectedPoint.equalWeight - selectedPoint.observation) * 10) / 10 > 0 ? `+${Math.round((selectedPoint.equalWeight - selectedPoint.observation) * 10) / 10}` : Math.round((selectedPoint.equalWeight - selectedPoint.observation) * 10) / 10}
+              Delta vs Ref: {Math.round((selectedPoint.equalWeight - selectedPoint.observation) * 10) / 10 > 0 ? `+${Math.round((selectedPoint.equalWeight - selectedPoint.observation) * 10) / 10}` : Math.round((selectedPoint.equalWeight - selectedPoint.observation) * 10) / 10}
             </div>
           </div>
 
@@ -207,7 +212,7 @@ export const ForecastBlendingScreen: React.FC<ForecastBlendingScreenProps> = ({
               {selectedPoint.varsa} <span className="text-xs font-normal text-sky-200">{currentVariable.unit}</span>
             </div>
             <div className="text-[11px] text-sky-200 mt-1 font-mono">
-              Delta vs Truth: {Math.round((selectedPoint.varsa - selectedPoint.observation) * 10) / 10 > 0 ? `+${Math.round((selectedPoint.varsa - selectedPoint.observation) * 10) / 10}` : Math.round((selectedPoint.varsa - selectedPoint.observation) * 10) / 10} (Lowest Error)
+              Delta vs Ref: {Math.round((selectedPoint.varsa - selectedPoint.observation) * 10) / 10 > 0 ? `+${Math.round((selectedPoint.varsa - selectedPoint.observation) * 10) / 10}` : Math.round((selectedPoint.varsa - selectedPoint.observation) * 10) / 10} (Lowest Error)
             </div>
           </div>
         </div>
@@ -224,7 +229,7 @@ export const ForecastBlendingScreen: React.FC<ForecastBlendingScreenProps> = ({
                 <th className="py-2.5 px-3">Disagreement</th>
                 <th className="py-2.5 px-3">Simple Mean</th>
                 <th className="py-2.5 px-3 font-bold text-sky-900">VARSA Blend</th>
-                <th className="py-2.5 px-3">Truth (AWS)</th>
+                <th className="py-2.5 px-3">Observation Reference</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-mono tabular-nums">

@@ -8,9 +8,9 @@ import {
   LEAD_TIMES,
   WEATHER_REGIMES,
   VARIABLES,
-  getAdaptiveWeights,
   ModelWeights
 } from '../data/varsaData';
+import { calculateAdaptiveWeights } from '../lib/varsaEngine';
 import { IndiaMap } from './IndiaMap';
 import { Map, Layers, Info } from 'lucide-react';
 
@@ -36,12 +36,12 @@ export const ModelWeightMapScreen: React.FC<ModelWeightMapScreenProps> = ({
   const [weightLayer, setWeightLayer] = useState<'dominant' | 'ecmwf' | 'icon' | 'gfs'>('dominant');
 
   const allRegionWeights: Record<RegionId, ModelWeights> = {
-    north: getAdaptiveWeights('north', leadTime, regime, variable),
-    central: getAdaptiveWeights('central', leadTime, regime, variable),
-    west: getAdaptiveWeights('west', leadTime, regime, variable),
-    east: getAdaptiveWeights('east', leadTime, regime, variable),
-    south: getAdaptiveWeights('south', leadTime, regime, variable),
-    northeast: getAdaptiveWeights('northeast', leadTime, regime, variable),
+    north: calculateAdaptiveWeights('north', leadTime, regime, variable).weights,
+    central: calculateAdaptiveWeights('central', leadTime, regime, variable).weights,
+    west: calculateAdaptiveWeights('west', leadTime, regime, variable).weights,
+    east: calculateAdaptiveWeights('east', leadTime, regime, variable).weights,
+    south: calculateAdaptiveWeights('south', leadTime, regime, variable).weights,
+    northeast: calculateAdaptiveWeights('northeast', leadTime, regime, variable).weights,
   };
 
   const selectedWeights = allRegionWeights[region];

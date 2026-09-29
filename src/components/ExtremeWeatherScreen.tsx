@@ -2,7 +2,13 @@ import React, { useState } from 'react';
 import { EXTREME_WEATHER_EVENTS, ExtremeWeatherEvent } from '../data/varsaData';
 import { AlertTriangle, CloudRain, Sun, Wind, ShieldAlert, CheckCircle2, MapPin, Clock } from 'lucide-react';
 
-export const ExtremeWeatherScreen: React.FC = () => {
+interface ExtremeWeatherScreenProps {
+  onSelectScenario?: (presetId: string) => void;
+}
+
+export const ExtremeWeatherScreen: React.FC<ExtremeWeatherScreenProps> = ({
+  onSelectScenario
+}) => {
   const [filterType, setFilterType] = useState<'all' | 'heavy_rain' | 'heat' | 'high_wind'>('all');
   const [filterSeverity, setFilterSeverity] = useState<'all' | 'Severe Warning' | 'Warning' | 'Watch'>('all');
 
@@ -44,11 +50,11 @@ export const ExtremeWeatherScreen: React.FC = () => {
           <div className="flex items-center gap-2">
             <h2 className="text-base font-bold text-slate-900 tracking-tight">EXTREME WEATHER GUIDANCE</h2>
             <span className="text-xs font-mono text-rose-800 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded">
-              Operational Decision Support
+              Operational guidance — demonstration
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Hazard detection and actionable early warnings calibrated from VARSA multi-model consensus
+            Prototype hazard guidance and demonstration scenarios synthesized from multi-model consensus
           </p>
         </div>
 
@@ -108,7 +114,7 @@ export const ExtremeWeatherScreen: React.FC = () => {
       <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-xs space-y-3">
         <div className="flex items-center justify-between border-b border-slate-100 pb-2">
           <span className="text-xs font-mono uppercase font-bold text-slate-700 tracking-wider">
-            Operational Early Hazard Matrix
+            Prototype Hazard Guidance — Demonstration Scenarios
           </span>
           <span className="text-[11px] font-mono text-slate-500">
             Automated Cross-Model Consensus
@@ -117,7 +123,11 @@ export const ExtremeWeatherScreen: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {/* Row 1: Heavy Rain */}
-          <div className="p-3 rounded border border-rose-200 bg-rose-50/50 flex flex-col justify-between space-y-2">
+          <div
+            onClick={() => onSelectScenario?.('scenario-a')}
+            className="p-3 rounded border border-rose-200 bg-rose-50/50 flex flex-col justify-between space-y-2 cursor-pointer hover:border-rose-400 hover:shadow-xs transition-all"
+            title="Click to load Scenario A: Central India Rainfall +24h"
+          >
             <div className="flex items-center justify-between">
               <span className="text-xs font-mono font-bold text-rose-900 uppercase">HEAVY RAIN</span>
               <span className="text-[10px] font-mono bg-rose-100 text-rose-800 border border-rose-200 px-1.5 py-0.5 rounded font-bold">
@@ -134,7 +144,11 @@ export const ExtremeWeatherScreen: React.FC = () => {
           </div>
 
           {/* Row 2: Heat */}
-          <div className="p-3 rounded border border-amber-200 bg-amber-50/50 flex flex-col justify-between space-y-2">
+          <div
+            onClick={() => onSelectScenario?.('scenario-b')}
+            className="p-3 rounded border border-amber-200 bg-amber-50/50 flex flex-col justify-between space-y-2 cursor-pointer hover:border-amber-400 hover:shadow-xs transition-all"
+            title="Click to load Scenario B: North India Temperature +48h"
+          >
             <div className="flex items-center justify-between">
               <span className="text-xs font-mono font-bold text-amber-900 uppercase">HEAT</span>
               <span className="text-[10px] font-mono bg-amber-100 text-amber-800 border border-amber-200 px-1.5 py-0.5 rounded font-bold">
@@ -151,7 +165,11 @@ export const ExtremeWeatherScreen: React.FC = () => {
           </div>
 
           {/* Row 3: High Wind */}
-          <div className="p-3 rounded border border-blue-200 bg-blue-50/50 flex flex-col justify-between space-y-2">
+          <div
+            onClick={() => onSelectScenario?.('scenario-d')}
+            className="p-3 rounded border border-blue-200 bg-blue-50/50 flex flex-col justify-between space-y-2 cursor-pointer hover:border-blue-400 hover:shadow-xs transition-all"
+            title="Click to load Scenario D: West Coast Wind +24h"
+          >
             <div className="flex items-center justify-between">
               <span className="text-xs font-mono font-bold text-blue-900 uppercase">HIGH WIND</span>
               <span className="text-[10px] font-mono bg-blue-100 text-blue-800 border border-blue-200 px-1.5 py-0.5 rounded font-bold">
@@ -246,7 +264,7 @@ export const ExtremeWeatherScreen: React.FC = () => {
             <div className="space-y-1 text-xs bg-slate-900 text-slate-200 p-3 rounded">
               <div className="font-semibold text-sky-400 font-mono text-[11px] uppercase tracking-wider flex items-center gap-1.5">
                 <ShieldAlert className="w-3.5 h-3.5" />
-                Civil Defense / Disaster Management Advisory:
+                Operational Guidance — Demonstration:
               </div>
               <p className="text-[11px] text-slate-300 leading-relaxed font-sans">
                 {evt.operationalGuidance}
@@ -255,7 +273,7 @@ export const ExtremeWeatherScreen: React.FC = () => {
 
             {/* Affected Districts */}
             <div className="pt-2 border-t border-slate-100 flex items-center gap-2 text-xs">
-              <span className="text-[11px] font-mono text-slate-400 shrink-0">Districts on Alert:</span>
+              <span className="text-[11px] font-mono text-slate-400 shrink-0">Districts in Scenario:</span>
               <div className="flex flex-wrap gap-1">
                 {evt.affectedDistricts.map((d, i) => (
                   <span key={d} className="text-[11px] font-mono text-slate-700 bg-slate-100 px-1.5 py-0.2 rounded">
@@ -271,10 +289,10 @@ export const ExtremeWeatherScreen: React.FC = () => {
       {/* Operational Protocol Note */}
       <div className="bg-slate-50 border border-slate-200 p-4 rounded text-xs text-slate-600 space-y-1">
         <div className="font-semibold text-slate-800 uppercase font-mono text-[11px]">
-          Operational Integration Standard:
+          Demonstration Guidance Notice:
         </div>
         <p className="leading-relaxed">
-          Guidance thresholds are aligned with Indian Meteorological Department (IMD) color-coded warning scales (Red: Action Required, Orange: Be Prepared, Yellow: Be Aware). VARSA reduces false alarms by dynamically damping single-model over-predictive outliers while preserving critical heavy-tail threat signals.
+          Guidance thresholds reflect prototype demonstration scenarios structured for the Smart India Hackathon showcase. These scenarios illustrate multi-model hazard consensus and do NOT constitute active official alerts issued by civil authorities.
         </p>
       </div>
     </div>

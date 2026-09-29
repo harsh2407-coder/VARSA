@@ -131,9 +131,12 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({
       <div className="bg-white border border-slate-200 rounded-lg p-5 shadow-xs space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
           <div>
+            <div className="text-[10px] font-mono uppercase text-sky-700 font-bold tracking-wider mb-0.5">
+              Prototype Verification Framework
+            </div>
             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
               <BarChart3 className="w-4 h-4 text-sky-600" />
-              Comparative Verification Metric: {metricDescriptions[selectedMetric].name}
+              Comparative Metric: {metricDescriptions[selectedMetric].name}
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
               {metricDescriptions[selectedMetric].summary} ({metricDescriptions[selectedMetric].better})
@@ -244,13 +247,13 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({
           <div className="p-3 bg-emerald-50/60 border border-emerald-200 rounded">
             <div className="text-[11px] font-mono uppercase text-emerald-800 font-semibold flex items-center gap-1.5">
               <Award className="w-3.5 h-3.5 text-emerald-600" />
-              Demonstration Delta vs Equal Weight
+              DEMONSTRATION DELTA
             </div>
-            <div className="text-2xl font-mono font-bold text-emerald-950 mt-1 tabular-nums">
-              +{metricsData.skillImprovementPercent}%
+            <div className="text-lg font-mono font-bold text-emerald-950 mt-1 tracking-tight">
+              ILLUSTRATIVE COMPARISON
             </div>
             <p className="text-[11px] text-emerald-800/80 mt-1">
-              Simulated error reduction attained by contextually suppressing biased member predictions
+              Prototype demonstration data — not an operational performance claim.
             </p>
           </div>
 
@@ -262,7 +265,7 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({
               {metricsData.varsa.mae} <span className="text-xs text-slate-500 font-normal">{currentVariable.unit}</span>
             </div>
             <p className="text-[11px] text-slate-500 mt-1">
-              Lowest absolute error across individual NWP models and simple 1/3 ensemble mean in test runs
+              Illustrative comparison using prototype demonstration data
             </p>
           </div>
 
@@ -274,7 +277,7 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({
               {metricsData.varsa.bias > 0 ? `+${metricsData.varsa.bias}` : metricsData.varsa.bias} <span className="text-xs text-slate-500 font-normal">{currentVariable.unit}</span>
             </div>
             <p className="text-[11px] text-slate-500 mt-1">
-              Neutralized directional drift; balances GFS over-prediction and ECMWF under-prediction
+              Illustrative comparison using prototype demonstration data
             </p>
           </div>
         </div>
@@ -284,7 +287,7 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({
       <div className="bg-white border border-slate-200 rounded-lg p-5 shadow-xs space-y-3">
         <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
           <FileSpreadsheet className="w-4 h-4 text-sky-600" />
-          Verification Scorecard Matrix: {currentRegion.name} ({currentVariable.name})
+          Prototype Verification Framework: Scorecard Matrix ({currentRegion.name} · {currentVariable.name})
         </h3>
 
         <div className="overflow-x-auto">
@@ -341,7 +344,7 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({
           Demonstration Dataset Disclosure & Scientific Honesty:
         </div>
         <p>
-          All demo metrics presented in this matrix are calibrated demonstration dataset values structured for the Smart India Hackathon showcase. These metrics illustrate the multi-model skill verification architecture and do NOT represent certified real-world operational forecasts. VARSA does not claim real-time operational forecasting until full IMD instrumentation integration.
+          All metrics presented in this matrix are demonstration dataset values structured for the Smart India Hackathon showcase. These metrics illustrate the multi-model skill verification architecture and do NOT represent certified real-world operational forecasts. VARSA does not claim real-time operational forecasting until full observation network integration.
         </p>
       </div>
     </div>

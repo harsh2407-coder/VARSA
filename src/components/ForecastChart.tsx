@@ -142,7 +142,7 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({
             className={`flex items-center gap-1.5 font-medium transition-opacity ${visibleTraces.observation ? 'opacity-100' : 'opacity-40'}`}
           >
             <span className="w-2 h-2 rounded-full border border-purple-600 bg-purple-100 inline-block"></span>
-            <span className="text-purple-700">Observational Truth</span>
+            <span className="text-purple-700">Observation Reference</span>
           </button>
         </div>
 
@@ -379,7 +379,7 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({
                 VARSA: <span className="tabular-nums text-sky-800">{activePoint.varsa}</span> {variable.unit}
               </span>
               {visibleTraces.observation && (
-                <span className="text-purple-700">Truth: <strong className="tabular-nums">{activePoint.observation}</strong></span>
+                <span className="text-purple-700">Ref: <strong className="tabular-nums">{activePoint.observation}</strong></span>
               )}
             </div>
           </div>

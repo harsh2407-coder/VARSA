@@ -2,8 +2,8 @@
  * VARSA — Adaptive Weather Intelligence Engine
  * Deterministic Meteorological Prototype Dataset & Scientific Logic
  * 
- * NOTE: Values are structured demonstration data calibrated to represent
- * operational NWP divergence patterns across Indian meteorological sub-divisions.
+ * NOTE: Values are structured demonstration data designed to represent
+ * prototype NWP divergence patterns across Indian meteorological sub-divisions.
  */
 
 export type RegionId = 'north' | 'central' | 'west' | 'east' | 'south' | 'northeast';
@@ -239,11 +239,13 @@ export const WEATHER_REGIMES: Record<WeatherRegimeId, WeatherRegimeInfo> = {
 
 /**
  * Deterministic Adaptive Weights Engine
- * Simulates the trained XGBoost context-weighting model based on:
+ * Implements prototype inference logic based on:
  * - Region topographical characteristics
  * - Forecast lead time
  * - Meteorological regime
  * - Target variable
+ * 
+ * NOTE: Intended production architecture targets trained XGBoost contextual weighting.
  */
 export function getAdaptiveWeights(
   region: RegionId,
@@ -251,10 +253,9 @@ export function getAdaptiveWeights(
   regime: WeatherRegimeId,
   variable: VariableId
 ): ModelWeights {
-  // Deterministic lookup tables derived from NWP historical skill patterns over South Asia
-  // ECMWF: Excels at medium-range synoptic waves & temperature advection
-  // ICON: Excels at short-range mesoscale convection & boundary-layer wind
-  // GFS: Strong in upper-air thermodynamics, but known positive precipitation bias over India
+  // Deterministic lookup tables structuring demonstration divergence patterns across South Asian contexts
+  // Weights illustrate how a context-aware blending system would allocate contributions by region, regime, lead time, and variable.
+  // These are demonstration values — NOT measured real-world operational performance.
   
   let gfs = 0.30;
   let ecmwf = 0.45;
@@ -268,13 +269,13 @@ export function getAdaptiveWeights(
       ecmwf = 0.52;
       gfs = 0.26;
       icon = 0.22;
-      rationale = 'ECMWF superior representation of mid-latitude Rossby wave propagation over Tibetan plateau.';
+      rationale = 'In this demonstration scenario, ECMWF receives 52% weight for synoptic wave representation over the Tibetan plateau region; GFS contribution at 26%; ICON at 22%.';
       disagreement = 5.2;
     } else {
       ecmwf = 0.44;
       gfs = 0.32;
       icon = 0.24;
-      rationale = 'GFS shows strong diurnal thermal cycle over Indo-Gangetic basin; blended with ECMWF synoptic moisture.';
+      rationale = 'In this demonstration scenario, GFS contribution at 32%; ECMWF receives 44% weight for synoptic moisture representation; ICON at 24%.';
       disagreement = 4.1;
     }
   } else if (region === 'central') {
@@ -283,20 +284,20 @@ export function getAdaptiveWeights(
         ecmwf = 0.46;
         gfs = 0.32;
         icon = 0.22;
-        rationale = 'ECMWF synoptic moisture advection (46%) balanced with GFS thermal low boundary dynamics (32%) and ICON localized convective triggers (22%).';
+        rationale = 'In this demonstration scenario, ECMWF receives 46% weight for synoptic moisture advection; GFS contribution at 32%; ICON allocated 22% for convective structure.';
         disagreement = 5.4;
       } else {
         icon = 0.40;
         ecmwf = 0.38;
         gfs = 0.22;
-        rationale = 'ICON 13km non-hydrostatic core captures localized convective triggers in core monsoon zone; GFS downweighted due to known wet bias.';
+        rationale = 'In this demonstration scenario, ICON receives 40% weight for convective structure; ECMWF at 38% for synoptic moisture; GFS contribution reduced to 22%.';
         disagreement = 6.4;
       }
     } else {
       ecmwf = 0.48;
       gfs = 0.28;
       icon = 0.24;
-      rationale = 'ECMWF IFS 0.1° shows superior boundary layer temperature skill during continental heating.';
+      rationale = 'In this demonstration scenario, ECMWF receives 48% weight for synoptic temperature representation; GFS contribution reduced to 28%; ICON at 24%.';
       disagreement = 3.6;
     }
   } else if (region === 'west') {
@@ -304,13 +305,13 @@ export function getAdaptiveWeights(
       icon = 0.42;
       ecmwf = 0.36;
       gfs = 0.22;
-      rationale = 'ICON boundary-layer turbulence parameterization outperforms across Western Ghats steep orography.';
+      rationale = 'In this demonstration scenario, ICON receives 42% weight for coastal terrain representation; ECMWF at 36% for synoptic flow; GFS contribution at 22%.';
       disagreement = 5.8;
     } else {
       ecmwf = 0.46;
       icon = 0.30;
       gfs = 0.24;
-      rationale = 'ECMWF balances coastal moisture convergence and sea-breeze inland penetration.';
+      rationale = 'In this demonstration scenario, ECMWF receives 46% weight for coastal moisture representation; ICON at 30%; GFS contribution at 24%.';
       disagreement = 4.4;
     }
   } else if (region === 'east') {
@@ -318,26 +319,26 @@ export function getAdaptiveWeights(
       ecmwf = 0.50;
       icon = 0.28;
       gfs = 0.22;
-      rationale = 'ECMWF track and intensity skill over Bay of Bengal cyclonic circulations is statistically dominant.';
+      rationale = 'In this demonstration scenario, ECMWF receives 50% weight for synoptic low tracking; ICON allocated 28% for coastal resolution; GFS contribution at 22%.';
       disagreement = 7.1;
     } else {
       ecmwf = 0.42;
       gfs = 0.30;
       icon = 0.28;
-      rationale = 'Balanced multi-model consensus for Gangetic delta moisture advection.';
+      rationale = 'In this demonstration scenario, ECMWF receives 42% weight for synoptic flow; GFS contribution at 30%; ICON at 28%.';
       disagreement = 4.9;
     }
   } else if (region === 'south') {
     ecmwf = 0.48;
     icon = 0.32;
     gfs = 0.20;
-    rationale = 'ECMWF synoptic flow combined with ICON coastal resolution handles peninsular orographic shadowing.';
+    rationale = 'In this demonstration scenario, ECMWF receives 48% weight for peninsular synoptic flow; ICON allocated 32% for coastal terrain representation; GFS contribution at 20%.';
     disagreement = 3.9;
   } else if (region === 'northeast') {
     icon = 0.44;
     ecmwf = 0.36;
     gfs = 0.20;
-    rationale = 'Steep Himalayan orography requires ICON fine-mesh mass conservation; GFS struggles with valley channeling.';
+    rationale = 'In this demonstration scenario, ICON receives 44% weight for complex terrain representation; ECMWF allocated 36% for synoptic moisture flow; GFS contribution at 20%.';
     disagreement = 6.8;
   }
 
@@ -430,7 +431,7 @@ export function getForecastTimeSeries(
     // Simple Equal Weight baseline for comparison
     const eqVal = Math.round(((gfsVal + ecmwfVal + iconVal) / 3) * 10) / 10;
 
-    // Synthetic ground observation curve (for historical demonstration)
+    // Synthetic observation reference curve (for demonstration verification)
     // Closest to VARSA blend with subtle measurement noise
     const obsNoise = Math.sin(i * 2.3) * (variable === 'rainfall' ? 1.8 : 0.4);
     const obsVal = Math.max(0, Math.round((varsaVal + obsNoise) * 10) / 10);
@@ -453,14 +454,14 @@ export function getForecastTimeSeries(
   });
 
   const selectedPoint = points.find(p => p.hours === LEAD_TIMES[leadTime].hours) || points[1];
-  const summary = `At ${LEAD_TIMES[leadTime].label}, raw NWP models exhibit a ${selectedPoint.spread} ${VARIABLES[variable].unit} spread. VARSA blends GFS (${Math.round(weights.gfs * 100)}%), ECMWF (${Math.round(weights.ecmwf * 100)}%), and ICON (${Math.round(weights.icon * 100)}%) yielding ${selectedPoint.varsa} ${VARIABLES[variable].unit}.`;
+  const summary = `At ${LEAD_TIMES[leadTime].label}, demonstration NWP inputs exhibit a ${selectedPoint.spread} ${VARIABLES[variable].unit} spread. VARSA blends GFS (${Math.round(weights.gfs * 100)}%), ECMWF (${Math.round(weights.ecmwf * 100)}%), and ICON (${Math.round(weights.icon * 100)}%) yielding ${selectedPoint.varsa} ${VARIABLES[variable].unit} (Demonstration run).`;
 
   return { points, weights, summary };
 }
 
 /**
- * Historical Verification Dataset (Demonstrative)
- * Evaluated over 180 continuous forecast cycles vs IMD Automated Weather Station truths
+ * Historical Verification Dataset (Demonstration Dataset)
+ * Evaluated over simulated test cycles vs observation references
  */
 export const VERIFICATION_DATA: Record<VariableId, Record<RegionId, VerificationMetrics>> = {
   rainfall: {
@@ -617,7 +618,7 @@ export const VERIFICATION_DATA: Record<VariableId, Record<RegionId, Verification
 
 /**
  * Extreme Weather Guidance Catalog
- * Demonstration operational scenarios based on Indian meteorological early warning protocols
+ * Demonstration hazard scenarios illustrating multi-model early warning guidance
  */
 export const EXTREME_WEATHER_EVENTS: ExtremeWeatherEvent[] = [
   {
@@ -632,7 +633,7 @@ export const EXTREME_WEATHER_EVENTS: ExtremeWeatherEvent[] = [
     threshold: '> 64.5 mm (Heavy Rainfall)',
     severity: 'Warning',
     probability: 84,
-    modelConsensus: 'GFS predicts 126mm (systematic wet bias), ECMWF indicates 82mm, ICON indicates 89mm. VARSA adaptive weighting (ECMWF 46%, GFS 32%, ICON 22%) filters over-prediction to 94.2mm.',
+    modelConsensus: 'In this demonstration scenario, GFS member runs at 126mm, ECMWF member at 82mm, ICON member at 89mm. VARSA adaptive weighting (ECMWF 46%, GFS 32%, ICON 22%) blends these inputs to 94.2mm, reducing the influence of the highest individual member.',
     operationalGuidance: 'Elevated signal for localized waterlogging in Nagpur, Wardha, and Betul drainage basins. Alert local disaster management teams for short-fuse urban culvert backflows.',
     affectedDistricts: ['Nagpur', 'Wardha', 'Betul', 'Chhindwara', 'Hoshangabad']
   },
@@ -703,49 +704,49 @@ export const PIPELINE_STEPS: PipelineStep[] = [
   {
     id: 1,
     stepNumber: '01',
-    label: 'Model forecast ingestion',
-    detail: 'Streaming raw GRIB2 datasets: NOAA GFS 0.25°, ECMWF IFS 0.1°, DWD ICON 13km',
+    label: 'Load demonstration model inputs',
+    detail: 'NWP Model Inputs: GFS • ECMWF • ICON • Prototype demonstration data',
     durationMs: 420,
-    metric: '3 Numerical Models Ingested'
+    metric: '3 Demonstration Inputs Loaded'
   },
   {
     id: 2,
     stepNumber: '02',
-    label: 'Data harmonization',
-    detail: 'Reprojecting, bilinear spatial interpolation, and vertical grid unification to 0.1° South Asia grid',
+    label: 'Harmonize prototype forecast fields',
+    detail: 'Demonstration spatial grid harmonization across multi-model forecast fields',
     durationMs: 440,
-    metric: 'Unified 0.1° Geodetic Grid'
+    metric: 'Demo Grid Harmonized'
   },
   {
     id: 3,
     stepNumber: '03',
-    label: 'Context analysis',
-    detail: 'Classifying synoptic regime, orographic land-sea mask, and rolling 14-day regional bias patterns',
+    label: 'Analyze forecast context',
+    detail: 'Classifying synoptic regime, terrain factors, and recent skill / bias context — demonstration',
     durationMs: 460,
-    metric: 'Regime Classified: Active Trough'
+    metric: 'Context Evaluated'
   },
   {
     id: 4,
     stepNumber: '04',
-    label: 'Adaptive weighting',
-    detail: 'Evaluating contextual loss-minimization weighting matrix across forecast lead-times',
+    label: 'Calculate adaptive demonstration weights',
+    detail: 'Evaluating VARSA adaptive weighting engine across forecast lead times (Prototype inference logic)',
     durationMs: 480,
-    metric: 'Weights Calibrated: ECMWF 46% · GFS 32% · ICON 22%'
+    metric: 'Weights: ECMWF 46% • GFS 32% • ICON 22%'
   },
   {
     id: 5,
     stepNumber: '05',
-    label: 'Forecast blending',
-    detail: 'Synthesizing adaptive multi-model blended surface with thermodynamic conservation',
+    label: 'Generate weighted blended forecast',
+    detail: 'Context-aware weighted ensemble synthesis across model inputs',
     durationMs: 420,
-    metric: 'VARSA Blend Surface Generated'
+    metric: 'Blended Estimate Generated'
   },
   {
     id: 6,
     stepNumber: '06',
-    label: 'Verification',
-    detail: 'Evaluating blended surface against automated AWS/radar ground truth references',
+    label: 'Run demonstration verification',
+    detail: 'Verification layer compares model estimates against observation references',
     durationMs: 380,
-    metric: 'Verification Quality Passed'
+    metric: 'Observation Reference Checked'
   }
 ];

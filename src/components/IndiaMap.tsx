@@ -1,5 +1,6 @@
 import React from 'react';
-import { RegionId, REGIONS, ModelWeights, getAdaptiveWeights, LeadTimeId, WeatherRegimeId, VariableId } from '../data/varsaData';
+import { RegionId, REGIONS, ModelWeights, LeadTimeId, WeatherRegimeId, VariableId } from '../data/varsaData';
+import { calculateAdaptiveWeights } from '../lib/varsaEngine';
 
 interface IndiaMapProps {
   selectedRegion: RegionId;
@@ -66,14 +67,14 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
   mode = 'command',
   weightLayer = 'dominant'
 }) => {
-  // Precompute weights for all regions
+  // Precompute weights for all regions using central engine
   const regionalWeights: Record<RegionId, ModelWeights> = {
-    north: getAdaptiveWeights('north', leadTime, regime, variable),
-    central: getAdaptiveWeights('central', leadTime, regime, variable),
-    west: getAdaptiveWeights('west', leadTime, regime, variable),
-    east: getAdaptiveWeights('east', leadTime, regime, variable),
-    south: getAdaptiveWeights('south', leadTime, regime, variable),
-    northeast: getAdaptiveWeights('northeast', leadTime, regime, variable),
+    north: calculateAdaptiveWeights('north', leadTime, regime, variable).weights,
+    central: calculateAdaptiveWeights('central', leadTime, regime, variable).weights,
+    west: calculateAdaptiveWeights('west', leadTime, regime, variable).weights,
+    east: calculateAdaptiveWeights('east', leadTime, regime, variable).weights,
+    south: calculateAdaptiveWeights('south', leadTime, regime, variable).weights,
+    northeast: calculateAdaptiveWeights('northeast', leadTime, regime, variable).weights,
   };
 
   const getRegionFill = (regionId: RegionId, isSelected: boolean) => {
