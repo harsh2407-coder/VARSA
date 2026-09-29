@@ -4,7 +4,8 @@
 
 VARSA is a prototype adaptive forecast-blending intelligence layer that sits above multiple Numerical Weather Prediction (NWP) models — GFS, ECMWF, and ICON — and combines their outputs using context-dependent weights rather than treating every model equally.
 
-**Live Demo:** [https://varsa-demo.vercel.app](https://varsa-demo.vercel.app)
+**Live Demo:** [https://varsa-demo.vercel.app](https://varsa-demo.vercel.app)  
+**Technical Documentation Report (PDF):** [docs/VARSA_Technical_Documentation.pdf](docs/VARSA_Technical_Documentation.pdf)
 
 > **⚠️ Prototype / Demonstration Notice**
 > The current implementation operates entirely on a local deterministic prototype dataset structured to demonstrate the adaptive blending concept. All weights, verification metrics, and forecast values are demonstration data. This is **not** an operational system and does not claim validated real-world forecasting performance.
