@@ -48,8 +48,15 @@ import {
   ShieldAlert,
   ChevronRight,
   Sparkles,
-  Cpu
+  Cpu,
+  Radio
 } from 'lucide-react';
+import {
+  fetchRealMultiModelForecast,
+  generateAssamCloudburstSimulation,
+  MultiModelForecastResult
+} from './lib/realDataProvider';
+import { RealForecastPanel } from './components/RealForecastPanel';
 
 type NavTabId = 'overview' | 'blending' | 'weight_map' | 'verification' | 'extreme_guidance';
 
@@ -64,6 +71,12 @@ export default function App() {
   const [isPipelineOpen, setIsPipelineOpen] = useState<boolean>(false);
   const [isMethodologyOpen, setIsMethodologyOpen] = useState<boolean>(false);
   const [lastBlendTime, setLastBlendTime] = useState<string>('Demo Run: Cycle 00Z +24h');
+
+  // Real Data Provider integration states (Task 2 Multi-Model Ingestion)
+  const [showRealForecast, setShowRealForecast] = useState<boolean>(false);
+  const [realForecastData, setRealForecastData] = useState<MultiModelForecastResult | null>(null);
+  const [isRealForecastLoading, setIsRealForecastLoading] = useState<boolean>(false);
+  const [realForecastError, setRealForecastError] = useState<string | null>(null);
 
   // Active entities
   const region = REGIONS[selectedRegion];
@@ -110,6 +123,39 @@ export default function App() {
   const handlePipelineComplete = () => {
     setIsPipelineOpen(false);
     setLastBlendTime('VARSA DEMONSTRATION RUN COMPLETE');
+  };
+
+  const handleFetchRealForecast = async (
+    targetLat = region.lat,
+    targetLon = region.lon,
+    bypassCache = false
+  ) => {
+    setShowRealForecast(true);
+    setIsRealForecastLoading(true);
+    setRealForecastError(null);
+    try {
+      const result = await fetchRealMultiModelForecast({
+        latitude: targetLat,
+        longitude: targetLon,
+        forecastDays: 3,
+        timeoutMs: 8000,
+        bypassCache
+      });
+      setRealForecastData(result);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Unknown network failure';
+      setRealForecastError(msg);
+    } finally {
+      setIsRealForecastLoading(false);
+    }
+  };
+
+  const handleSimulateAssamCloudburst = () => {
+    setShowRealForecast(true);
+    setIsRealForecastLoading(false);
+    setRealForecastError(null);
+    const simResult = generateAssamCloudburstSimulation();
+    setRealForecastData(simResult);
   };
 
   return (
@@ -411,12 +457,22 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Primary Action Button: RUN VARSA BLEND */}
+                  {/* Primary Action Buttons */}
                   <div className="flex items-center gap-3 shrink-0">
                     <div className="hidden md:flex flex-col text-right font-mono text-[11px] text-slate-500">
                       <span>{lastBlendTime}</span>
                       <span className="text-emerald-700 font-semibold">Demo Grid · Harmonized Representation</span>
                     </div>
+
+                    {/* Live Real Data Forecast Button (Task 2 Multi-Model NWP Blend) */}
+                    <button
+                      onClick={() => handleFetchRealForecast()}
+                      className="px-4 py-2 text-xs font-bold text-sky-950 bg-sky-100 hover:bg-sky-200 active:bg-sky-300 rounded shadow-xs transition-all duration-150 flex items-center gap-2 whitespace-nowrap cursor-pointer border border-sky-300"
+                      title={`Fetch real GFS, ECMWF & ICON forecasts from Open-Meteo for ${region.name} (${region.lat}°N, ${region.lon}°E)`}
+                    >
+                      <Radio className={`w-3.5 h-3.5 text-sky-700 ${isRealForecastLoading ? 'animate-spin' : ''}`} />
+                      <span>{showRealForecast ? 'REFRESH MULTI-MODEL BLEND' : 'LOAD REAL MULTI-MODEL BLEND'}</span>
+                    </button>
 
                     <button
                       onClick={handleRunBlend}
@@ -690,6 +746,21 @@ export default function App() {
                     )}
                   </div>
                 </div>
+
+                {/* ===================================================================
+                    LIVE REAL MULTI-MODEL FORECAST BLEND SLICE (GFS · ECMWF · ICON)
+                    =================================================================== */}
+                {showRealForecast && (
+                  <RealForecastPanel
+                    region={region}
+                    realData={realForecastData}
+                    isLoading={isRealForecastLoading}
+                    error={realForecastError}
+                    onRefresh={(bypass) => handleFetchRealForecast(region.lat, region.lon, bypass)}
+                    onSimulateAssam={handleSimulateAssamCloudburst}
+                    onClose={() => setShowRealForecast(false)}
+                  />
+                )}
 
                 {/* ===================================================================
                     BOTTOM: FORECAST / VERIFICATION VISUALIZATIONS
