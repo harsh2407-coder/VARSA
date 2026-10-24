@@ -33,7 +33,7 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({
     { id: 'ecmwf', name: 'ECMWF IFS', color: '#2563EB' },
     { id: 'icon', name: 'DWD ICON', color: '#059669' },
     { id: 'equalWeight', name: 'Equal Weight (1/3 Mean)', color: '#64748B', isBaseline: true },
-    { id: 'varsa', name: 'VARSA Adaptive Blend', color: '#0F172A', isVarsa: true },
+    { id: 'varsa', name: 'VARSA Demo Weighted Blend', color: '#0F172A', isVarsa: true },
   ];
 
   // Maximum value for bar chart scaling
@@ -301,11 +301,11 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({
                 <th className="py-2.5 px-3">CSI</th>
                 <th className="py-2.5 px-3">POD</th>
                 <th className="py-2.5 px-3">FAR</th>
-                <th className="py-2.5 px-3 font-bold text-slate-900">Rank</th>
+                <th className="py-2.5 px-3 font-bold text-slate-900">Demo Tag</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-mono tabular-nums">
-              {models.map((m, idx) => {
+              {models.map((m) => {
                 const met = metricsData[m.id];
                 return (
                   <tr key={m.id} className={m.isVarsa ? 'bg-sky-50 font-semibold' : 'hover:bg-slate-50'}>
@@ -324,10 +324,10 @@ export const VerificationScreen: React.FC<VerificationScreenProps> = ({
                     <td className="py-2 px-3">
                       {m.isVarsa ? (
                         <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">
-                          #1 Optimal
+                          Illustrative
                         </span>
                       ) : (
-                        <span className="text-slate-500 font-mono">#{idx + 1}</span>
+                        <span className="text-slate-500 font-mono">Reference</span>
                       )}
                     </td>
                   </tr>

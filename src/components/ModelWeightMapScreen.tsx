@@ -52,7 +52,7 @@ export const ModelWeightMapScreen: React.FC<ModelWeightMapScreenProps> = ({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-slate-200 rounded-lg p-4 shadow-xs">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-base font-bold text-slate-900 tracking-tight">ADAPTIVE MODEL CONTRIBUTION</h2>
+            <h2 className="text-base font-bold text-slate-900 tracking-tight">DEMONSTRATION MODEL CONTRIBUTION</h2>
             <span className="text-xs font-mono text-sky-800 bg-sky-50 border border-sky-200 px-2 py-0.5 rounded">
               Geographic Allocation Surface
             </span>
@@ -220,7 +220,7 @@ export const ModelWeightMapScreen: React.FC<ModelWeightMapScreenProps> = ({
             </div>
 
             <div className="bg-slate-50 p-3 rounded border border-slate-200 text-xs text-slate-600 space-y-1">
-              <div className="font-semibold text-slate-800">Contextual Learning Logic:</div>
+              <div className="font-semibold text-slate-800">Demonstration Weight Rules:</div>
               <p className="leading-relaxed">
                 {selectedWeights.weightRationale}
               </p>
@@ -279,7 +279,7 @@ export const ModelWeightMapScreen: React.FC<ModelWeightMapScreenProps> = ({
             </div>
 
             <p className="text-slate-600 leading-relaxed">
-              <strong>Core Idea:</strong> Different geographic regions receive different model contributions based on local terrain, synoptic patterns, and historical skill.
+              <strong>Demonstration:</strong> Hand-authored rules vary model contributions by region and selected forecast context. They are not learned from historical skill or measured performance.
             </p>
 
             <div className="grid grid-cols-1 gap-1.5 font-mono text-[11px]">

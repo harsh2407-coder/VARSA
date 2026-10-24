@@ -72,7 +72,7 @@ export interface VarsaEngineResult {
   equalWeightForecast: number;
   observationReference: number;
 
-  // Adaptive model weights (guaranteed sum === 1.000)
+  // Hand-authored demonstration weights (guaranteed sum === 1.000)
   weights: ModelWeights;
 
   // Computed disagreement
@@ -311,8 +311,7 @@ export function generateDeterministicForecasts(
     const rawEqual = (gfsVal + ecmwfVal + iconVal) / 3;
     const eqVal = Math.max(0, Math.round(rawEqual * 10) / 10);
 
-    // Deterministic Observation Reference
-    // Sits close to the consensus blend with subtle realistic calibration variance
+    // Synthetic demonstration reference, not an observed value
     const obsNoise = Math.sin(i * 2.1) * (variable === 'rainfall' ? 1.6 : variable === 'temperature' ? 0.3 : 1.2);
     const obsVal = Math.max(0, Math.round((varsaVal + obsNoise) * 10) / 10);
 
@@ -374,7 +373,7 @@ export function categorizeDisagreement(
     return {
       spread,
       level: 'High',
-      description: `High divergence among models — adaptive weighting suppression active (Spread: ±${spread} ${VARIABLES[variable].unit})`
+      description: `High divergence among demonstration model values (Spread: ±${spread} ${VARIABLES[variable].unit})`
     };
   }
 }

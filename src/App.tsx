@@ -1,12 +1,12 @@
 /**
- * VARSA — Adaptive Weather Intelligence Engine
+ * VARSA — Weather Intelligence Prototype
  * Smart India Hackathon 2026 Showcase Prototype
  * 
  * Desktop-first Command-Center Architecture:
- * - Top Header: VARSA | Adaptive Weather Intelligence Engine | System Status | Demo Mode
+ * - Top Header: VARSA | Weather Intelligence Prototype | System Status | Demo Mode
  * - LEFT: Compact Sidebar Navigation (Overview, Forecast Blend, Model Weights, Verification, Extreme Guidance)
  * - CENTER: Primary weather / map visualization (India Forecast Map - visual anchor)
- * - RIGHT: Adaptive Model Weights panel (Demonstration weights, clean bars, contextual rationale)
+ * - RIGHT: Demonstration Model Weights panel (scenario weights and rationale)
  * - BOTTOM: Forecast Blend & Verification visualizations
  */
 
@@ -128,7 +128,7 @@ export default function App() {
                 VARSA
               </span>
               <span className="hidden sm:inline text-xs text-slate-500 font-mono border-l border-slate-300 pl-2.5">
-                Adaptive Weather Intelligence Engine
+                Weather Intelligence Prototype
               </span>
             </div>
             <span className="text-[10px] font-mono text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded font-medium">
@@ -285,10 +285,10 @@ export default function App() {
                 <span>NWP Blending Concept</span>
               </div>
               <p className="text-[11px] text-slate-700 leading-snug font-sans italic">
-                “When weather models disagree, VARSA learns which forecast to trust — and how much.”
+                “VARSA demonstrates a rules-based way to combine forecast model outputs.”
               </p>
               <div className="text-[10px] font-mono text-slate-500 pt-1 border-t border-slate-200">
-                GFS + ECMWF + ICON &rarr; VARSA Adaptive Layer
+                GFS + ECMWF + ICON &rarr; Demonstration Weighted Blend
               </div>
             </div>
           </div>
@@ -322,7 +322,7 @@ export default function App() {
               VIEW 1: OVERVIEW (THE COMMAND CENTER)
               Controls: Region, Variable, Lead Time, Weather Regime, RUN VARSA BLEND
               Center: INDIA FORECAST MAP (visual anchor)
-              Right: ADAPTIVE MODEL WEIGHTS
+              Right: DEMONSTRATION MODEL WEIGHTS
               Bottom: FORECAST BLEND & Verification Briefing
               ======================================================================= */}
           {activeTab === 'overview' && (
@@ -491,7 +491,7 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* CURRENT CONTEXT & VARSA ADAPTIVE RESPONSE STRIP (Prompt Section 11 & 12) */}
+                {/* Current context and demonstration weight rules */}
                 <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-xs grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
                   {/* Left (5 cols): Current Context */}
                   <div className="lg:col-span-5 space-y-1.5 border-b lg:border-b-0 lg:border-r border-slate-100 pb-3 lg:pb-0 lg:pr-4">
@@ -522,12 +522,12 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Right (7 cols): VARSA Adaptive Response */}
+                  {/* Right (7 cols): demonstration weight rules */}
                   <div className="lg:col-span-7 space-y-1">
                     <div className="flex items-center gap-2 text-xs font-mono">
                       <span className="font-bold text-sky-950 uppercase tracking-wider text-[11px] flex items-center gap-1">
                         <Cpu className="w-3.5 h-3.5 text-sky-700" />
-                        <span>VARSA ADAPTIVE RESPONSE</span>
+                        <span>DEMONSTRATION WEIGHT RULES</span>
                       </span>
                       <span className="text-[10px] text-slate-400 border-l border-slate-200 pl-2">
                         Demonstration scenario
@@ -540,7 +540,7 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* 2-Column Split: Center (India Map) & Right (Adaptive Weights) */}
+                {/* 2-Column Split: Center (India Map) & Right (Demonstration Weights) */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                   {/* ===================================================================
                       CENTER: PRIMARY WEATHER / MAP VISUALIZATION (Col-span 7)
@@ -638,11 +638,11 @@ export default function App() {
                   </div>
 
                   {/* ===================================================================
-                      RIGHT: ADAPTIVE MODEL INTELLIGENCE PANEL (Col-span 5)
+                      RIGHT: DEMONSTRATION MODEL WEIGHTS PANEL (Col-span 5)
                       Demonstration weights, clean bars, contextual rationale, regional alert
                       =================================================================== */}
                   <div className="lg:col-span-5 space-y-4">
-                    {/* Adaptive Model Weights Component */}
+                    {/* Demonstration Model Weights Component */}
                     <AdaptiveWeightsPanel
                       weights={weights}
                       region={region}
@@ -710,7 +710,7 @@ export default function App() {
 
                     <div className="flex items-center gap-3">
                       <span className="text-[11px] font-mono text-slate-400">
-                        Observation reference enabled
+                        Illustrative demo reference enabled
                       </span>
                       <button
                         onClick={() => setActiveTab('blending')}
@@ -744,7 +744,7 @@ export default function App() {
                     </div>
 
                     <p className="text-xs text-slate-600 leading-relaxed font-sans">
-                      {contextSummary.rationale} Based on demonstration evaluation, the adaptive weighting scheme dampens individual NWP systematic biases across {region.subdivision} and produces an optimal consensus trajectory for disaster risk reduction.
+                      {contextSummary.rationale} These hand-authored demonstration rules produce a weighted mean for {region.subdivision}; they are not trained on observations or evidence that the blend is more accurate than an individual model.
                     </p>
 
                     {/* Pipeline Status Indicators */}
@@ -759,11 +759,11 @@ export default function App() {
                       </div>
                       <div className="flex items-center gap-1.5">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>04 Adaptive Weights: Prototype Engine</span>
+                        <span>04 Scenario Weights: Demonstration Rules</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>06 Verification: Observation Reference Checked</span>
+                        <span>06 Verification: Illustrative Reference Compared</span>
                       </div>
                     </div>
                   </div>
@@ -789,7 +789,7 @@ export default function App() {
           )}
 
           {/* =======================================================================
-              VIEW 3: MODEL WEIGHT MAP SCREEN (ADAPTIVE MODEL CONTRIBUTION)
+              VIEW 3: MODEL WEIGHT MAP SCREEN (DEMONSTRATION MODEL CONTRIBUTION)
               ======================================================================= */}
           {activeTab === 'weight_map' && (
             <div className="p-6">
@@ -863,7 +863,7 @@ export default function App() {
           01 Model forecast ingestion
           02 Data harmonization
           03 Context analysis
-          04 Adaptive weighting
+          04 Demonstration scenario weights
           05 Forecast blending
           06 Verification
           ========================================================================= */}

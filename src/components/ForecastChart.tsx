@@ -142,7 +142,7 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({
             className={`flex items-center gap-1.5 font-medium transition-opacity ${visibleTraces.observation ? 'opacity-100' : 'opacity-40'}`}
           >
             <span className="w-2 h-2 rounded-full border border-purple-600 bg-purple-100 inline-block"></span>
-            <span className="text-purple-700">Observation Reference</span>
+            <span className="text-purple-700">Demonstration Reference</span>
           </button>
         </div>
 

@@ -38,20 +38,20 @@ export const AdaptiveWeightsPanel: React.FC<AdaptiveWeightsPanelProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-bold text-slate-900 tracking-tight">ADAPTIVE MODEL WEIGHTS</h3>
+            <h3 className="text-sm font-bold text-slate-900 tracking-tight">DEMONSTRATION BLEND WEIGHTS</h3>
             <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider">
               {leadTime.label}
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            VARSA Adaptive Weighting Engine · {region.name}
+            Hand-authored scenario rules · {region.name}
           </p>
         </div>
 
         {/* Prototype Inference / Demonstration weights Label */}
         <div className="text-right">
           <span className="text-[11px] font-mono text-sky-800 bg-sky-50 border border-sky-200 px-2 py-0.5 rounded font-medium">
-            Prototype inference logic
+            Not learned or performance-based
           </span>
         </div>
       </div>
@@ -182,7 +182,7 @@ export const AdaptiveWeightsPanel: React.FC<AdaptiveWeightsPanelProps> = ({
       {gfsVal !== undefined && ecmwfVal !== undefined && iconVal !== undefined && blendedVal !== undefined && (
         <div className="bg-slate-900 text-slate-100 p-3 rounded font-mono text-xs space-y-1.5 border border-slate-800 shadow-xs">
           <div className="flex items-center justify-between text-[10px] text-slate-400">
-            <span className="uppercase font-semibold tracking-wider text-sky-300">Deterministic Blend Formulation</span>
+            <span className="uppercase font-semibold tracking-wider text-sky-300">Demonstration Blend Formulation</span>
             <span className="text-emerald-400 font-bold">Σ Weights = 100%</span>
           </div>
           <div className="text-[11px] bg-slate-950 p-2 rounded border border-slate-800 text-sky-100 overflow-x-auto leading-snug">

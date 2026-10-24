@@ -238,8 +238,8 @@ export const WEATHER_REGIMES: Record<WeatherRegimeId, WeatherRegimeInfo> = {
 };
 
 /**
- * Deterministic Adaptive Weights Engine
- * Implements prototype inference logic based on:
+ * Deterministic demonstration weight rules
+ * Applies hand-authored rules based on:
  * - Region topographical characteristics
  * - Forecast lead time
  * - Meteorological regime
@@ -728,8 +728,8 @@ export const PIPELINE_STEPS: PipelineStep[] = [
   {
     id: 4,
     stepNumber: '04',
-    label: 'Calculate adaptive demonstration weights',
-    detail: 'Evaluating VARSA adaptive weighting engine across forecast lead times (Prototype inference logic)',
+    label: 'Calculate demonstration scenario weights',
+    detail: 'Applying hand-authored region and forecast-context rules (not learned from performance)',
     durationMs: 480,
     metric: 'Weights: ECMWF 46% • GFS 32% • ICON 22%'
   },
@@ -737,7 +737,7 @@ export const PIPELINE_STEPS: PipelineStep[] = [
     id: 5,
     stepNumber: '05',
     label: 'Generate weighted blended forecast',
-    detail: 'Context-aware weighted ensemble synthesis across model inputs',
+    detail: 'Weighted mean of deterministic demonstration model values',
     durationMs: 420,
     metric: 'Blended Estimate Generated'
   },
@@ -745,8 +745,8 @@ export const PIPELINE_STEPS: PipelineStep[] = [
     id: 6,
     stepNumber: '06',
     label: 'Run demonstration verification',
-    detail: 'Verification layer compares model estimates against observation references',
+    detail: 'Compare generated values with an illustrative reference, not measured observations',
     durationMs: 380,
-    metric: 'Observation Reference Checked'
+    metric: 'Illustrative Reference Compared'
   }
 ];

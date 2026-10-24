@@ -95,7 +95,7 @@ export const ForecastBlendingScreen: React.FC<ForecastBlendingScreenProps> = ({
               {currentVariable.name} Evolution (0h to 144h)
             </h3>
             <p className="text-xs text-slate-500">
-              Click any timestep or axis column to inspect member divergence and observation reference delta
+              Click any timestep or axis column to inspect member divergence and demonstration reference delta
             </p>
           </div>
 
@@ -192,7 +192,7 @@ export const ForecastBlendingScreen: React.FC<ForecastBlendingScreenProps> = ({
           <div className="p-3 bg-slate-50 border border-slate-200 rounded">
             <div className="flex items-center justify-between text-xs text-slate-700 font-semibold">
               <span>Equal Weight</span>
-              <span className="font-mono text-[10px]">33/33/33%</span>
+              <span className="font-mono text-[10px]">1/3 each</span>
             </div>
             <div className="text-2xl font-mono font-bold text-slate-800 mt-1 tabular-nums">
               {selectedPoint.equalWeight} <span className="text-xs font-normal text-slate-500">{currentVariable.unit}</span>
@@ -206,13 +206,13 @@ export const ForecastBlendingScreen: React.FC<ForecastBlendingScreenProps> = ({
           <div className="p-3 bg-sky-950 text-white rounded border border-sky-900 shadow-sm">
             <div className="flex items-center justify-between text-xs text-sky-300 font-bold">
               <span>VARSA BLENDED</span>
-              <span className="font-mono text-[10px] text-emerald-400">OPTIMAL</span>
+              <span className="font-mono text-[10px] text-sky-200">DEMO BLEND</span>
             </div>
             <div className="text-2xl font-mono font-bold text-white mt-1 tabular-nums">
               {selectedPoint.varsa} <span className="text-xs font-normal text-sky-200">{currentVariable.unit}</span>
             </div>
             <div className="text-[11px] text-sky-200 mt-1 font-mono">
-              Delta vs Ref: {Math.round((selectedPoint.varsa - selectedPoint.observation) * 10) / 10 > 0 ? `+${Math.round((selectedPoint.varsa - selectedPoint.observation) * 10) / 10}` : Math.round((selectedPoint.varsa - selectedPoint.observation) * 10) / 10} (Lowest Error)
+              Delta vs Ref: {Math.round((selectedPoint.varsa - selectedPoint.observation) * 10) / 10 > 0 ? `+${Math.round((selectedPoint.varsa - selectedPoint.observation) * 10) / 10}` : Math.round((selectedPoint.varsa - selectedPoint.observation) * 10) / 10}
             </div>
           </div>
         </div>
@@ -229,7 +229,7 @@ export const ForecastBlendingScreen: React.FC<ForecastBlendingScreenProps> = ({
                 <th className="py-2.5 px-3">Disagreement</th>
                 <th className="py-2.5 px-3">Simple Mean</th>
                 <th className="py-2.5 px-3 font-bold text-sky-900">VARSA Blend</th>
-                <th className="py-2.5 px-3">Observation Reference</th>
+                <th className="py-2.5 px-3">Demonstration Reference</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-mono tabular-nums">

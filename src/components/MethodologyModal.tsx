@@ -35,10 +35,10 @@ export const MethodologyModal: React.FC<MethodologyModalProps> = ({ isOpen, onCl
           <div className="bg-slate-50 border-l-4 border-sky-600 p-4 rounded-r">
             <h4 className="text-xs font-mono uppercase tracking-wider text-sky-900 font-bold">The Core Principle</h4>
             <p className="text-sm font-semibold text-slate-900 mt-1 italic">
-              “When weather models disagree, VARSA learns which forecast to trust — and how much.”
+              “VARSA's prototype demonstrates a rules-based way to combine forecast model outputs.”
             </p>
             <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-              Global and regional Numerical Weather Prediction (NWP) models (NOAA GFS, ECMWF IFS, DWD ICON) possess systematic, regime-dependent strengths and biases. VARSA sits above these models as an adaptive forecast intelligence and blending layer rather than replacing numerical atmospheric physics.
+              The current prototype uses deterministic demonstration values and hand-authored context rules. It has no live model ingestion, trained weighting model, or observation-based performance feedback; those belong to a future operational design.
             </p>
           </div>
 
@@ -76,7 +76,7 @@ export const MethodologyModal: React.FC<MethodologyModalProps> = ({ isOpen, onCl
                   </div>
                   <div className="text-center text-slate-400">↓</div>
                   <div className="p-2 rounded bg-white border border-slate-200">
-                    Context-aware weighting logic
+                    Hand-authored context rules
                   </div>
                   <div className="text-center text-slate-400">↓</div>
                   <div className="p-2 rounded bg-white border border-slate-200 font-semibold text-sky-950">
@@ -159,12 +159,12 @@ export const MethodologyModal: React.FC<MethodologyModalProps> = ({ isOpen, onCl
               </div>
 
               <div className="p-3.5 bg-sky-50/60 border border-sky-200 rounded">
-                <div className="font-semibold text-sky-950 mb-1">VARSA Adaptive Contextual Blending:</div>
+                <div className="font-semibold text-sky-950 mb-1">Prototype Context-Rule Blend:</div>
                 <div className="font-mono bg-white p-2 border border-sky-200 rounded text-sky-900 text-[11px] mb-2">
                   F_VARSA = Σ [ w_m(x, y, L, θ) · F_m ]
                 </div>
                 <p className="text-slate-600 leading-relaxed">
-                  Weights w_m are dynamically evaluated based on terrain, forecast horizon, and regime conditions, constrained to Σ w_m = 1. High-performing models in the specific meteorological regime receive higher weighting.
+                  In this deterministic demonstration, hand-authored rules vary weights by selected region, variable, lead time, and regime, constrained to Σ w_m = 1. The rules are not trained or adjusted using historical verification or observed model performance.
                 </p>
               </div>
             </div>
